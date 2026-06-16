@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARRITO - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <link rel="stylesheet" href="CSS/css_carrito.css">
+</head>
+<body>
+    <header id="navbar">
+        <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
+        <div class="logo-box">
+            <center>
+                <img src="IMAGENES/ESCOMercado.png" class="img-logo" alt="Logo">
+            </center>
+        </div>
+        <button class="btn-nav">Contacto</button>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2 class="main-title">Tu Carrito de Compras</h2>
+        </div>
+
+        <div class="cart-wrapper">
+            <section class="cart-2">
+                <div class="cart">
+                    <img src="https://via.placeholder.com/150x150?text=iPhone+17e" alt="Producto" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">iPhone 17e</h3>
+                        <p class="item-v">Vendedor: Juan Pérez</p>
+                    </div>
+                    <div class="item-cu">
+                        <label for="qty1">Cant.</label>
+                        <input type="number" id="qty1" value="1" min="1" class="qty-input">
+                    </div>
+                    <div class="item-pricing">
+                        <p class="price">$18,500 MXN</p>
+                        <button class="btn-remove">Eliminar</button>
+                    </div>
+                </div>
+
+                <div class="cart">
+                    <img src="https://via.placeholder.com/150x150?text=Laptop" alt="Producto" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Laptop Asus ROG</h3>
+                        <p class="item-v">Vendedor: María Gómez</p>
+                    </div>
+                    <div class="item-cu">
+                        <label for="qty2">Cant.</label>
+                        <input type="number" id="qty2" value="1" min="1" class="qty-input">
+                    </div>
+                    <div class="item-pricing">
+                        <p class="price">$22,000 MXN</p>
+                        <button class="btn-remove">Eliminar</button>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="cart-2">
+                <h3 class="title-1">Resumen de Compra</h3>
+                <div class="row">
+                    <span>Subtotal (2 productos)</span>
+                    <span>$40,500 MXN</span>
+                </div>
+                <div class="row">
+                    <span>Cargos por entrega</span>
+                    <span>Gratis en ESCOM</span>
+                </div>
+                <hr class="summary-divider">
+                <div class="summary-row total-row">
+                    <span>Total</span>
+                    <span>$40,500 MXN</span>
+                </div>
+                <button class="btn-checkout">Proceder al Pago</button>
+                <center>
+                    <button class="btn-continue" onclick="window.location.href='PRODUCTOS.html'">Seguir comprando</button>
+                </center>
+            </aside>
+        </div>
+    </main>
+</body>
+</html>

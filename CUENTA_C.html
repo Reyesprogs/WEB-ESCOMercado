@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <link rel="stylesheet" href="CSS/css_cuenta_c.css">
+</head>
+<body>
+    
+    <header id="menu">
+        <button class="enlace" onclick="window.location.href='INICIO.html'">Inicio</button>
+        <div class="marca">
+            <center>
+                <img src="IMAGENES/ESCOMercado.png" class="logo" alt="Logo">
+            </center>
+        </div>
+        <button class="enlace">Contacto</button>
+    </header>
+
+    <main class="principal">
+        
+        <aside class="perfil">
+            <div class="avatar">
+                <img src="https://via.placeholder.com/150" alt="Foto" class="foto">
+            </div>
+            <h2 class="nombre">Reyes Caballero Jesus Emmanuel</h2>
+            <p class="correo">escom_student@ipn.mx</p>
+            <span class="grado">Estudiante ESCOM</span>
+            
+            <button class="volver" onclick="window.location.href='INICIO.html'">← Regresar al Inicio</button>
+        </aside>
+
+        <div class="detalles">
+            
+            <div class="bloques">
+                
+                <section class="tarjeta">
+                    <h3 class="titulo">Historial de Pedidos</h3>
+                    <div class="lista">
+                        <div class="renglon">
+                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <div class="info">
+                                <h4>Libro de Cálculo Purcell</h4>
+                                <p>Entregado el 12/05 - Zona: Palapas</p>
+                            </div>
+                        </div>
+                        <div class="renglon">
+                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <div class="info">
+                                <h4>Protoboard y Jumpers</h4>
+                                <p>Entregado el 08/05 - Zona: Edificio 2</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="explorar">Ver todo el historial</button>
+                </section>
+
+                <section class="tarjeta">
+                    <h3 class="titulo">Productos Guardados</h3>
+                    <div class="lista">
+                        <div class="renglon">
+                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <div class="info">
+                                <h4>Laptop Asus ROG</h4>
+                                <p class="costo">$22,000 MXN</p>
+                            </div>
+                            <button class="corazon">❤️</button>
+                        </div>
+                        <div class="renglon">
+                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <div class="info">
+                                <h4>Calculadora Casio fx-991</h4>
+                                <p class="costo">$450 MXN</p>
+                            </div>
+                            <button class="corazon">❤️</button>
+                        </div>
+                    </div>
+                    <button class="explorar">Ver mis favoritos</button>
+                </section>
+            </div>
+
+            <section class="tarjeta ayuda">
+                <h3 class="titulo">Soporte Técnico</h3>
+                <p class="explicacion">¿Tuviste algún problema con tu cuenta, una entrega o un vendedor? Déjanos un mensaje y el equipo de ESCOMercado te ayudará.</p>
+                
+                <form action="#" method="POST" class="formulario">
+                    <div class="campo">
+                        <label for="asunto">Asunto del problema</label>
+                        <input type="text" id="asunto" name="asunto" placeholder="Ej. El vendedor no se presentó..." required>
+                    </div>
+                    <div class="campo">
+                        <label for="descripcion">Descripción detallada</label>
+                        <textarea id="descripcion" name="descripcion" placeholder="Describe tu situación aquí..." required></textarea>
+                    </div>
+                    <button type="submit" class="mandar">Enviar Reporte</button>
+                </form>
+            </section>
+
+        </div>
+    </main>
+</body>
+</html>

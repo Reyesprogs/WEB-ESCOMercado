@@ -1,0 +1,14 @@
+1. Paleta de Colores "Tech-ESCOM" (Versión Azul)
+
+Superficies: Azul Medianoche (#0F172A) - fondo principal.
+
+Acentos: Azul Cobalto Vibrante (#3B82F6) - para elementos interactivos (botones, enlaces destacados, etc.). Este tono de azul brillante ofrece un contraste excelente con el fondo oscuro y aporta una estética moderna y de ingeniería.
+
+Detalles: Gris Platino (#E5E7EB).
+
+Estatus: Oro Viejo (#B38E5D).
+
+------------------------PAGINAS DE REFERENCIA
+https://www.apple.com/store
+https://mx.nothing.tech/products/phone-3a?Color=Negro&Capacidad=12%2B256GB
+https://oakstreetbootmakers.com/
