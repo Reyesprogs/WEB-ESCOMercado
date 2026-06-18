@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-
-
 <html lang="es">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,44 +28,39 @@
 
         <div class="cart-wrapper">
             <section class="cart-2">
+                
                 <div class="cart">
-                    <img src="https://via.placeholder.com/150x150?text=iPhone+17e" alt="Producto" class="item-img">
+                    <img src="<?php echo $item['ruta_imagen']; ?>" alt="Producto" class="item-img">
                     <div class="item-info">
-                        <h3 class="item-title">iPhone 17e</h3>
-                        <p class="item-v">Vendedor: Juan Pérez</p>
+                        <h3 class="item-title"><?php echo $item['titulo_producto']; ?></h3>
+                        <p class="item-v">Vendedor: <?php echo $item['nombre_vendedor']; ?></p>
                     </div>
+                    
                     <div class="item-cu">
-                        <label for="qty1">Cant.</label>
-                        <input type="number" id="qty1" value="1" min="1" class="qty-input">
+                        <form action="actualizar_cantidad.php" method="POST" style="display:inline;">
+                            <input type="hidden" name="id_item_carrito" value="<?php echo $item['id_carrito']; ?>">
+                            <label>Cant.</label>
+                            <input type="number" name="cantidad" value="<?php echo $item['cantidad']; ?>" min="1" class="qty-input" onchange="this.form.submit()">
+                        </form>
                     </div>
+
                     <div class="item-pricing">
-                        <p class="price">$18,500 MXN</p>
-                        <button class="btn-remove">Eliminar</button>
+                        <p class="price">$<?php echo $item['precio']; ?> MXN</p>
+                        
+                        <form action="eliminar_del_carrito.php" method="POST" style="margin-top: 5px;">
+                            <input type="hidden" name="id_eliminar" value="<?php echo $item['id_carrito']; ?>">
+                            <button type="submit" class="btn-remove">Eliminar</button>
+                        </form>
                     </div>
                 </div>
 
-                <div class="cart">
-                    <img src="https://via.placeholder.com/150x150?text=Laptop" alt="Producto" class="item-img">
-                    <div class="item-info">
-                        <h3 class="item-title">Laptop Asus ROG</h3>
-                        <p class="item-v">Vendedor: María Gómez</p>
-                    </div>
-                    <div class="item-cu">
-                        <label for="qty2">Cant.</label>
-                        <input type="number" id="qty2" value="1" min="1" class="qty-input">
-                    </div>
-                    <div class="item-pricing">
-                        <p class="price">$22,000 MXN</p>
-                        <button class="btn-remove">Eliminar</button>
-                    </div>
-                </div>
-            </section>
+                </section>
 
             <aside class="cart-2">
                 <h3 class="title-1">Resumen de Compra</h3>
                 <div class="row">
-                    <span>Subtotal (2 productos)</span>
-                    <span>$40,500 MXN</span>
+                    <span>Subtotal (<?php echo $total_articulos; ?> productos)</span>
+                    <span>$<?php echo $subtotal; ?> MXN</span>
                 </div>
                 <div class="row">
                     <span>Cargos por entrega</span>
@@ -76,9 +69,13 @@
                 <hr class="summary-divider">
                 <div class="summary-row total-row">
                     <span>Total</span>
-                    <span>$40,500 MXN</span>
+                    <span>$<?php echo $total_pagar; ?> MXN</span>
                 </div>
-                <button class="btn-checkout">Proceder al Pago</button>
+                
+                <form action="procesar_pago.php" method="POST">
+                    <button type="submit" class="btn-checkout">Proceder al Pago</button>
+                </form>
+
                 <center>
                     <button class="btn-continue" onclick="window.location.href='PRODUCTOS.html'">Seguir comprando</button>
                 </center>

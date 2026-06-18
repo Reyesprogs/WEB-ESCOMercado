@@ -28,9 +28,9 @@
             <div class="avatar">
                 <img src="https://via.placeholder.com/150" alt="Foto" class="foto">
             </div>
-            <h2 class="nombre">Reyes Caballero Jesus Emmanuel</h2>
-            <p class="correo">escom_student@ipn.mx</p>
-            <span class="grado">Estudiante ESCOM</span>
+            <h2 class="nombre"><?php echo $usuario['nombre'] . ' ' . $usuario['apellidos']; ?></h2>
+            <p class="correo"><?php echo $usuario['correo']; ?></p>
+            <span class="grado">Estudiante ESCOM - Boleta: <?php echo $usuario['boleta']; ?></span>
             
             <button class="volver" onclick="window.location.href='INICIO.html'">← Regresar al Inicio</button>
         </aside>
@@ -42,60 +42,52 @@
                 <section class="tarjeta">
                     <h3 class="titulo">Historial de Pedidos</h3>
                     <div class="lista">
+                        
                         <div class="renglon">
-                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <img src="<?php echo $pedido['ruta_imagen']; ?>" alt="Item" class="miniatura">
                             <div class="info">
-                                <h4>Libro de Cálculo Purcell</h4>
-                                <p>Entregado el 12/05 - Zona: Palapas</p>
+                                <h4><?php echo $pedido['titulo_producto']; ?></h4>
+                                <p>Fecha: <?php echo $pedido['fecha_compra']; ?> - Vendedor: <?php echo $pedido['vendedor']; ?></p>
                             </div>
                         </div>
-                        <div class="renglon">
-                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
-                            <div class="info">
-                                <h4>Protoboard y Jumpers</h4>
-                                <p>Entregado el 08/05 - Zona: Edificio 2</p>
-                            </div>
+
                         </div>
-                    </div>
                     <button class="explorar">Ver todo el historial</button>
                 </section>
 
                 <section class="tarjeta">
-                    <h3 class="titulo">Productos Guardados</h3>
+                    <h3 class="titulo">Productos Guardados (Favoritos)</h3>
                     <div class="lista">
+                        
                         <div class="renglon">
-                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <img src="<?php echo $fav['ruta_imagen']; ?>" alt="Item" class="miniatura">
                             <div class="info">
-                                <h4>Laptop Asus ROG</h4>
-                                <p class="costo">$22,000 MXN</p>
+                                <h4><?php echo $fav['titulo_producto']; ?></h4>
+                                <p class="costo">$<?php echo $fav['precio']; ?> MXN</p>
                             </div>
-                            <button class="corazon">❤️</button>
+                            <form action="quitar_favorito.php" method="POST">
+                                <input type="hidden" name="id_favorito" value="<?php echo $fav['id_favorito']; ?>">
+                                <button type="submit" class="corazon">❤️</button>
+                            </form>
                         </div>
-                        <div class="renglon">
-                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
-                            <div class="info">
-                                <h4>Calculadora Casio fx-991</h4>
-                                <p class="costo">$450 MXN</p>
-                            </div>
-                            <button class="corazon">❤️</button>
+
                         </div>
-                    </div>
                     <button class="explorar">Ver mis favoritos</button>
                 </section>
             </div>
 
             <section class="tarjeta ayuda">
                 <h3 class="titulo">Soporte Técnico</h3>
-                <p class="explicacion">¿Tuviste algún problema con tu cuenta, una entrega o un vendedor? Déjanos un mensaje y el equipo de ESCOMercado te ayudará.</p>
+                <p class="explicacion">¿Tuviste algún problema con tu cuenta, una entrega o un vendedor? Déjanos un mensaje y el equipo te ayudará.</p>
                 
-                <form action="#" method="POST" class="formulario">
+                <form action="procesar_soporte.php" method="POST" class="formulario">
                     <div class="campo">
                         <label for="asunto">Asunto del problema</label>
-                        <input type="text" id="asunto" name="asunto" placeholder="Ej. El vendedor no se presentó..." required>
+                        <input type="text" id="asunto" name="asunto_reporte" placeholder="Ej. El vendedor no se presentó..." required>
                     </div>
                     <div class="campo">
                         <label for="descripcion">Descripción detallada</label>
-                        <textarea id="descripcion" name="descripcion" placeholder="Describe tu situación aquí..." required></textarea>
+                        <textarea id="descripcion" name="desc_reporte" placeholder="Describe tu situación aquí..." required></textarea>
                     </div>
                     <button type="submit" class="mandar">Enviar Reporte</button>
                 </form>

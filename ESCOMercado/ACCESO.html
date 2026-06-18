@@ -9,7 +9,6 @@
     <title>Acceso - ESCOMercado</title>
     <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
     <style>
-        /* Variables basadas en la paleta Tech-ESCOM */
         :root {
             --azul-medianoche: #0F172A;
             --azul-cobalto: #3B82F6;
@@ -162,82 +161,82 @@
         </div>
 
         <div id="login" class="form-section active">
-            <form action="INICIO.html">
+            <form action="procesar_login.php" method="POST">
                 <div class="form-group">
                     <label>Usuario o Correo Institucional</label>
-                    <input type="text" placeholder="Ej. alumno@alumno.ipn.mx" required>
+                    <input type="text" name="credencial" placeholder="Ej. alumno@alumno.ipn.mx" required>
                 </div>
                 <div class="form-group">
                     <label>Contraseña</label>
-                    <input type="password" placeholder="Ingresa tu contraseña" required>
+                    <input type="password" name="password" placeholder="Ingresa tu contraseña" required>
                 </div>
                 <button type="submit" class="btn-submit">Entrar</button>
             </form>
         </div>
 
         <div id="reg-comp" class="form-section">
-            <form action="INICIO.html">
+            <form action="procesar_registro_c.php" method="POST">
                 <div style="display: flex; gap: 10px;">
                     <div class="form-group" style="flex: 1;">
                         <label>Nombre(s)</label>
-                        <input type="text" placeholder="Nombre" required>
+                        <input type="text" name="nombre" placeholder="Nombre" required>
                     </div>
                     <div class="form-group" style="flex: 1;">
                         <label>Apellidos</label>
-                        <input type="text" placeholder="Apellidos" required>
+                        <input type="text" name="apellidos" placeholder="Apellidos" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>No. de Boleta (IPN)</label>
-                    <input type="text" placeholder="Ej. 2021630000" pattern="[0-9]{10}" title="Ingresa tus 10 dígitos de boleta" required>
+                    <input type="text" name="boleta" placeholder="Ej. 2021630000" pattern="[0-9]{10}" title="Ingresa tus 10 dígitos de boleta" required>
                 </div>
                 <div class="form-group">
                     <label>Correo Electrónico</label>
-                    <input type="email" placeholder="correo@alumno.ipn.mx" required>
+                    <input type="email" name="correo" placeholder="correo@alumno.ipn.mx" required>
                 </div>
                 <div class="form-group">
                     <label>Nombre de Usuario</label>
-                    <input type="text" placeholder="Ej. escom_buyer" required>
+                    <input type="text" name="username" placeholder="Ej. escom_buyer" required>
                 </div>
                 <div class="form-group">
                     <label>Contraseña</label>
-                    <input type="password" placeholder="Crea una contraseña" required>
+                    <input type="password" name="password" placeholder="Crea una contraseña" required>
                 </div>
                 <button type="submit" class="btn-submit">Crear Cuenta Comprador</button>
             </form>
         </div>
 
         <div id="reg-vend" class="form-section">
-            <form action="INICIO.html">
+            <form action="procesar_registro_v.php" method="POST">
                 <div style="display: flex; gap: 10px;">
                     <div class="form-group" style="flex: 1;">
                         <label>Nombre(s)</label>
-                        <input type="text" placeholder="Nombre" required>
+                        <input type="text" name="nombre" placeholder="Nombre" required>
                     </div>
                     <div class="form-group" style="flex: 1;">
                         <label>Apellidos</label>
-                        <input type="text" placeholder="Apellidos" required>
+                        <input type="text" name="apellidos" placeholder="Apellidos" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>No. de Boleta (IPN)</label>
-                    <input type="text" placeholder="Ej. 2021630000" pattern="[0-9]{10}" required>
+                    <input type="text" name="boleta" placeholder="Ej. 2021630000" pattern="[0-9]{10}" required>
                 </div>
                 <div class="form-group">
                     <label>Correo Electrónico</label>
-                    <input type="email" placeholder="correo@alumno.ipn.mx" required>
+                    <input type="email" name="correo" placeholder="correo@alumno.ipn.mx" required>
                 </div>
                 <div class="form-group">
                     <label>Número Telefónico</label>
-                    <input type="tel" placeholder="10 dígitos para WhatsApp" pattern="[0-9]{10}" required>
+                    <input type="tel" name="telefono" placeholder="10 dígitos para WhatsApp" pattern="[0-9]{10}" required>
                 </div>
                 <div class="form-group">
                     <label>Nombre de Usuario</label>
-                    <input type="text" placeholder="Ej. escom_seller" required>
+                    <input type="text" name="username" placeholder="Ej. escom_seller" required>
                 </div>
                 <div class="form-group">
                     <label>Contraseña</label>
-                    <input type="password" placeholder="Crea una contraseña segura" required>
+                    <input type="password" name="password" placeholder="Crea una contraseña segura" required>
                 </div>
                 <button type="submit" class="btn-submit" style="background-color: var(--oro-viejo);">Crear Cuenta Vendedor</button>
             </form>
@@ -248,18 +247,13 @@
 
     <script>
         function switchTab(tabId) {
-            // Ocultar todos los formularios
             const sections = document.querySelectorAll('.form-section');
             sections.forEach(section => section.classList.remove('active'));
 
-            // Quitar clase active de todos los botones
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
 
-            // Mostrar el formulario seleccionado
             document.getElementById(tabId).classList.add('active');
-
-            // Marcar el botón correspondiente como activo
             event.target.classList.add('active');
         }
     </script>

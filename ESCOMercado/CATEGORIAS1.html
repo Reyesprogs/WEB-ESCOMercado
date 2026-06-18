@@ -6,13 +6,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CATEGORIAS</title>
+    <title>Categoría: <?php echo $nombre_categoria; ?> - ESCOMercado</title>
     <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
     <link rel="stylesheet" href="CSS/css_categoria1.css">
 </head>
 <body>
     <header id="navbar">
-        <button class="btn-nav">Inicio</button>
+        <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
         <div class="logo-box">
             <center>
                 <img src="IMAGENES/ESCOMercado.png" class="img-logo" alt="Logo">
@@ -22,90 +22,42 @@
     </header>
     <main>
         <div class="container">
-            <h2 class="main-title">Categorias de productos</h2>
+            <h2 class="main-title">Productos en la categoría: <?php echo $nombre_categoria; ?></h2>
         </div>
+        
         <section class="categories-grid">
-            <div class="category-card">
+            
+            <div class="category-card" onclick="window.location.href='PRODUCTO1.html?id=<?php echo $prod['id_producto']; ?>'">
                 <div class="card-content">
-                    <span class="card-tag">Nuevo</span>
-                    <h3 class="card-title">iPhone 17e</h3>
-                    <p class="card-subtitle">Potencia compacta. Valor increíble.</p>
+                    <span class="card-tag"><?php echo $prod['subcategoria']; ?></span>
+                    <h3 class="card-title"><?php echo $prod['titulo']; ?></h3>
+                    <p class="card-subtitle">$<?php echo $prod['precio']; ?> MXN</p>
                 </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
+                <img src="<?php echo $prod['ruta_imagen']; ?>" alt="Producto">
             </div>
-            <div class="category-card">
-                <div class="card-content">
-                    <span class="card-tag">Nuevo</span>
-                    <h3 class="card-title">iPhone 17e</h3>
-                    <p class="card-subtitle">Potencia compacta. Valor increíble.</p>
-                </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
-            </div>
-            <div class="category-card">
-                <div class="card-content">
-                    <span class="card-tag">Nuevo</span>
-                    <h3 class="card-title">iPhone 17e</h3>
-                    <p class="card-subtitle">Potencia compacta. Valor increíble.</p>
-                </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
-            </div>
-            <div class="category-card">
-                <div class="card-content">
-                    <span class="card-tag">Nuevo</span>
-                    <h3 class="card-title">iPhone 17e</h3>
-                    <p class="card-subtitle">Potencia compacta. Valor increíble.</p>
-                </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
-            </div>
-            <div class="category-card">
-                <div class="card-content">
-                    <span class="card-tag">Nuevo</span>
-                    <h3 class="card-title">iPhone 17e</h3>
-                    <p class="card-subtitle">Potencia compacta. Valor increíble.</p>
-                </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
-            </div>
-        </section>
+
+            </section>
+
         <div class="container">
-            <h2 class="main-title">Vendedores de esta categoria</h2>
+            <h2 class="main-title">Vendedores destacados en esta categoría</h2>
         </div>
+        
         <section class="categories-grid1">
+            
             <div class="category-card1">
                 <div class="card-content1">
-                    <span class="card-tag1">Nuevo</span>
-                    <h3 class="card-title1">iPhone 17e</h3>
-                    <p class="card-subtitle1">Potencia compacta. Valor increíble.</p>
+                    <span class="card-tag1">Vendedor Confiable</span>
+                    <h3 class="card-title1"><?php echo $vendedor['username']; ?></h3>
+                    <p class="card-subtitle1">Boleta: <?php echo $vendedor['boleta']; ?></p>
                 </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
+                <img src="<?php echo $vendedor['ruta_foto']; ?>" alt="Vendedor">
             </div>
-            <div class="category-card1">
-                <div class="card-content1">
-                    <span class="card-tag1">Nuevo</span>
-                    <h3 class="card-title1">iPhone 17e</h3>
-                    <p class="card-subtitle1">Potencia compacta. Valor increíble.</p>
-                </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
-            </div>
-            <div class="category-card1">
-                <div class="card-content1">
-                    <span class="card-tag1">Nuevo</span>
-                    <h3 class="card-title1">iPhone 17e</h3>
-                    <p class="card-subtitle1">Potencia compacta. Valor increíble.</p>
-                </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
-            </div>
-            <div class="category-card1">
-                <div class="card-content1">
-                    <span class="card-tag1">Nuevo</span>
-                    <h3 class="card-title1">iPhone 17e</h3>
-                    <p class="card-subtitle1">Potencia compacta. Valor increíble.</p>
-                </div>
-                <img src="https://via.placeholder.com/300x200?text=iPhone" alt="Producto">
-            </div>
-        </section>
+
+            </section>
+        
         <div class="container2">
-            <button class="btn-nav">REGRESAR</button>
+            <button class="btn-nav" onclick="history.back()">REGRESAR</button>
         </div>
     </main>
 </body>
-</html>
+</html>a

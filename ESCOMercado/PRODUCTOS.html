@@ -6,13 +6,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRODUCTOS</title>
+    <title>PRODUCTOS - ESCOMercado</title>
     <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
     <link rel="stylesheet" href="CSS/css_producto.css">
 </head>
 <body>
     <header id="navbar">
-        <button class="btn-nav">Inicio</button>
+        <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
         <div class="logo-box">
             <center>
                 <img src="IMAGENES/ESCOMercado.png" class="img-logo" alt="Logo">
@@ -22,263 +22,28 @@
     </header>
     <main>
         <div class="container">
-            <h2 class="main-title">Categorías de productos</h2>
+            <h2 class="main-title">Catálogo Global de Productos</h2>
         </div>
         <div class="seccion-navegacion">
             <button onclick="moverIzquierda()" class="flecha"> ❮ </button>
+            
             <div class="visor-botones" id="visor">
                 <div id="contenedor-dinamico" class="fila-larga">
-                    <button class="boton-item">
+                    
+                    <button class="boton-item" onclick="window.location.href='PRODUCTO1.html?id=<?php echo $producto['id_producto']; ?>'">
                         <div class="category-card">
                             <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">iPhone 17e</h3>
-                                <p class="card-subtitle">Fila 1 - Col 1</p>
+                                <span class="card-tag">Nuevo / <?php echo $producto['categoria']; ?></span>
+                                <h3 class="card-title"><?php echo $producto['titulo']; ?></h3>
+                                <p class="card-subtitle">$<?php echo $producto['precio']; ?> MXN</p>
                             </div>
-                            <img src="https://via.placeholder.com/80/A3D0FF/000000?text=IMG" alt="Producto">
+                            <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="Producto">
                         </div>
                     </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 2</h3>
-                                <p class="card-subtitle">Fila 2 - Col 1</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 3</h3>
-                                <p class="card-subtitle">Fila 3 - Col 1</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 4</h3>
-                                <p class="card-subtitle">Fila 4 - Col 1</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 5</h3>
-                                <p class="card-subtitle">Fila 5 - Col 1</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 6</h3>
-                                <p class="card-subtitle">Fila 6 - Col 1</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 7</h3>
-                                <p class="card-subtitle">Fila 1 - Col 2</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 8</h3>
-                                <p class="card-subtitle">Col 2</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 9</h3>
-                                <p class="card-subtitle">Col 2</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 10</h3>
-                                <p class="card-subtitle">Col 2</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 11</h3>
-                                <p class="card-subtitle">Col 2</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <span class="card-tag">Nuevo</span>
-                                <h3 class="card-title">Producto 12</h3>
-                                <p class="card-subtitle">Col 2</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="Producto">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 13</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 14</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 15</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 16</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 17</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 18</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 19</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 20</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 21</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 22</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 23</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 24</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card" style="background-color: #ffd1a3;">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 25</h3>
-                                <p>¡Soy la página 2!</p>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card" style="background-color: #ffd1a3;">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 26</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card" style="background-color: #ffd1a3;">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 27</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                    <button class="boton-item">
-                        <div class="category-card" style="background-color: #ffd1a3;">
-                            <div class="card-content">
-                                <h3 class="card-title">P. 28</h3>
-                            </div>
-                            <img src="https://via.placeholder.com/80" alt="P">
-                        </div>
-                    </button>
-                </div>
+
+                    </div>
             </div>
+            
             <button onclick="moverDerecha()" class="flecha"> ❯ </button>
         </div>
     </main>
@@ -286,7 +51,6 @@
         const visor = document.getElementById('visor');
 
         function moverDerecha() {
-            // Se desplaza el ancho total del visor (4 columnas)
             visor.scrollLeft += visor.offsetWidth;
         }
 
