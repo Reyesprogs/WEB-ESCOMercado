@@ -1,0 +1,141 @@
+/* RESET BÁSICO */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: #0F172A;
+}
+
+
+
+.main-title {
+    font-size: 3.5rem;   /* Aquí cambias el tamaño (ajusta a tu gusto) */
+    font-weight: 800;    /* Para que siga la temática de negritas de ESCOM */
+    color: #ffffff;      /* Color oscuro profesional */
+    margin-bottom: 20px; /* Espacio con el párrafo de abajo */
+    letter-spacing: -1px; /* Toque moderno de Plus Jakarta Sans */
+}
+
+/* --- CONFIGURACIÓN DEL HEADER --- */
+#navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color:  #303b53;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+    z-index: 2000;
+    height: 80px; 
+
+}
+/* --- BOTONES --- */
+.btn-nav {
+    padding: 15px 30px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 60px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.img-logo{
+    height: 60px;
+    width: 70px;
+}
+
+.btn-nav:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.container{
+    margin-top: 110px; 
+    text-align: center;
+    top: 0;
+    width: 100%;
+    padding: 0 5%;
+    z-index: 2000;
+    height: 80px; 
+
+}
+
+.btn2 {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+.btn2 {
+    padding: 15px 30px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 60px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+/* ////////////////////////////////////////////////////////////////////////////////*/
+
+/* Contenedor que permite que las flechas y el visor estén en la misma línea */
+.seccion-navegacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.visor-botones {
+    width: 1400px; /* Ancho para 4 tarjetas */
+    height: 900px; /* Alto suficiente para 6 filas */
+    overflow: hidden; /* Oculta lo que desborda */
+    scroll-behavior: smooth;
+}
+
+.fila-larga {
+    display: grid;
+    /* 1. Define 6 filas fijas */
+    grid-template-rows: repeat(6, 1fr); 
+    /* 2. IMPORTANTE: Obliga a que los botones nuevos se pongan en columnas a la derecha */
+    grid-auto-flow: column; 
+    /* 3. Define que cada columna ocupe el 25% (para que se vean 4) */
+    grid-auto-columns: calc(25% - 15px); 
+    gap: 15px;
+    height: 100%; /* El contenedor debe tener altura para que las 6 filas existan */
+}
+
+/* Limpieza del botón item */
+.boton-item {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 100%;
+}
+
+.category-card {
+    background-color: #a3d0ff;
+    border-radius: 20px;
+    height: 120px; /* Ajustado para que quepan 6 filas en el visor */
+    padding: 10px;
+    display: flex;
+    flex-direction: row; /* Imagen a un lado, texto al otro */
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.category-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 12px;
+}

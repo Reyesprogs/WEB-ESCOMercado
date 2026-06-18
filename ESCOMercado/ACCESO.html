@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <style>
+        /* Variables basadas en la paleta Tech-ESCOM */
+        :root {
+            --azul-medianoche: #0F172A;
+            --azul-cobalto: #3B82F6;
+            --gris-platino: #E5E7EB;
+            --oro-viejo: #B38E5D;
+            --fondo-tarjeta: #1E293B;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--azul-medianoche);
+            color: var(--gris-platino);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-container {
+            background-color: var(--fondo-tarjeta);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            margin: 20px;
+        }
+
+        .logo-center {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-center img {
+            width: 80px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #94A3B8;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .tab-btn.active {
+            color: var(--azul-cobalto);
+            border-bottom: 2px solid var(--azul-cobalto);
+            margin-bottom: -2px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #CBD5E1;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background-color: #0F172A;
+            color: white;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--azul-cobalto);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--azul-cobalto);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #2563EB;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: var(--gris-platino);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="logo-center">
+            <img src="IMAGENES/ESCOMercado.png" alt="Logo ESCOMercado">
+            <h2>Acceso al Sistema</h2>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('login')">Iniciar Sesión</button>
+            <button class="tab-btn" onclick="switchTab('reg-comp')">Soy Comprador</button>
+            <button class="tab-btn" onclick="switchTab('reg-vend')">Soy Vendedor</button>
+        </div>
+
+        <div id="login" class="form-section active">
+            <form action="INICIO.html">
+                <div class="form-group">
+                    <label>Usuario o Correo Institucional</label>
+                    <input type="text" placeholder="Ej. alumno@alumno.ipn.mx" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="Ingresa tu contraseña" required>
+                </div>
+                <button type="submit" class="btn-submit">Entrar</button>
+            </form>
+        </div>
+
+        <div id="reg-comp" class="form-section">
+            <form action="INICIO.html">
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Nombre(s)</label>
+                        <input type="text" placeholder="Nombre" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Apellidos</label>
+                        <input type="text" placeholder="Apellidos" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>No. de Boleta (IPN)</label>
+                    <input type="text" placeholder="Ej. 2021630000" pattern="[0-9]{10}" title="Ingresa tus 10 dígitos de boleta" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" placeholder="correo@alumno.ipn.mx" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre de Usuario</label>
+                    <input type="text" placeholder="Ej. escom_buyer" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="Crea una contraseña" required>
+                </div>
+                <button type="submit" class="btn-submit">Crear Cuenta Comprador</button>
+            </form>
+        </div>
+
+        <div id="reg-vend" class="form-section">
+            <form action="INICIO.html">
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Nombre(s)</label>
+                        <input type="text" placeholder="Nombre" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Apellidos</label>
+                        <input type="text" placeholder="Apellidos" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>No. de Boleta (IPN)</label>
+                    <input type="text" placeholder="Ej. 2021630000" pattern="[0-9]{10}" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" placeholder="correo@alumno.ipn.mx" required>
+                </div>
+                <div class="form-group">
+                    <label>Número Telefónico</label>
+                    <input type="tel" placeholder="10 dígitos para WhatsApp" pattern="[0-9]{10}" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre de Usuario</label>
+                    <input type="text" placeholder="Ej. escom_seller" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="Crea una contraseña segura" required>
+                </div>
+                <button type="submit" class="btn-submit" style="background-color: var(--oro-viejo);">Crear Cuenta Vendedor</button>
+            </form>
+        </div>
+
+        <a href="INICIO.html" class="back-link">← Regresar al Inicio</a>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // Ocultar todos los formularios
+            const sections = document.querySelectorAll('.form-section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Quitar clase active de todos los botones
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Mostrar el formulario seleccionado
+            document.getElementById(tabId).classList.add('active');
+
+            // Marcar el botón correspondiente como activo
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

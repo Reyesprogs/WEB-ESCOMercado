@@ -1,0 +1,227 @@
+/* RESET BÁSICO */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: #0F172A;
+}
+
+
+
+.main-title {
+    font-size: 3.5rem;   /* Aquí cambias el tamaño (ajusta a tu gusto) */
+    font-weight: 800;    /* Para que siga la temática de negritas de ESCOM */
+    color: #ffffff;      /* Color oscuro profesional */
+    margin-bottom: 20px; /* Espacio con el párrafo de abajo */
+    letter-spacing: -1px; /* Toque moderno de Plus Jakarta Sans */
+}
+
+/* --- CONFIGURACIÓN DEL HEADER --- */
+#navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color:  #303b53;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+    z-index: 2000;
+    height: 80px; 
+
+}
+/* --- BOTONES --- */
+.btn-nav {
+    padding: 15px 30px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 60px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.img-logo{
+    height: 60px;
+    width: 70px;
+}
+
+.btn-nav:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.container{
+    margin-top: 110px; 
+    text-align: center;
+    top: 0;
+    width: 100%;
+    padding: 0 5%;
+    z-index: 2000;
+    height: 80px; 
+
+}
+
+.btn2 {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+.btn2 {
+    padding: 15px 30px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 60px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+
+/* CONTENEDOR DE LAS TARJETAS */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Se ajusta solo a la pantalla */
+    gap: 25px;
+    padding: 40px 0;
+}
+
+/* LA TARJETA (CARD) */
+.category-card {
+    margin-top: 60px; 
+    background-color: #a3d0ff;
+    border-radius: 28px; /* Bordes muy redondeados tipo Apple */
+    height: 190px;
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* EFECTO HOVER (Como un botón grande) */
+.category-card:hover {
+    transform: scale(1.1); /* Se agranda un poquito */
+   
+}
+
+/* TEXTO DENTRO DE LA TARJETA */
+.card-tag {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0084ff; /* Color naranja de pre-order */
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.card-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0F172A;
+    margin-bottom: 8px;
+}
+
+.card-subtitle {
+    font-size: 1.1rem;
+    color: #474780;
+    font-weight: 500;
+}
+
+/* LA IMAGEN DENTRO */
+.category-card img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin-top: 20px;
+}
+
+/* BOTONES DE VENDEDORES------------------------------------------------------
+/* CONTENEDOR DE LAS TARJETAS */
+.categories-grid1 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Se ajusta solo a la pantalla */
+    gap: 25px;
+    padding: 40px 0;
+}
+
+/* LA TARJETA (CARD) */
+.category-card1 {
+    margin-top: 60px; 
+    background-color: #a3d0ff;
+    border-radius: 28px; /* Bordes muy redondeados tipo Apple */
+    height: 600px;
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* EFECTO HOVER (Como un botón grande) */
+.category-card1:hover {
+    transform: scale(.9); /* Se agranda un poquito */
+   
+}
+
+/* TEXTO DENTRO DE LA TARJETA */
+.card-tag1 {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0084ff; /* Color naranja de pre-order */
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.card-title1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0F172A;
+    margin-bottom: 8px;
+}
+
+.card-subtitle1 {
+    font-size: 1.1rem;
+    color: #474780;
+    font-weight: 500;
+}
+
+/* LA IMAGEN DENTRO */
+.category-card1 img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin-top: 20px;
+    padding: 20px;
+    margin: 15px; 
+    border: 2px solid #3B82F6; 
+    background-color: #0F172A; 
+    border-radius: 8px;
+
+}
+
+
+.container2{
+    margin-top: 40px; 
+    text-align: center;
+    top: 0;
+    width: 100%;
+    padding: 0 5%;
+    z-index: 2000;
+    height: 80px; 
+
+}

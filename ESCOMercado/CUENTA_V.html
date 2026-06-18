@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Vendedor - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <link rel="stylesheet" href="CSS/css_vendedor.css">
+</head>
+<body>
+    
+    <header id="menu">
+        <button class="enlace" onclick="window.location.href='INICIO.html'">Inicio</button>
+        <div class="marca">
+            <center>
+                <img src="IMAGENES/ESCOMercado.png" class="logo" alt="Logo">
+            </center>
+        </div>
+        <button class="enlace">Contacto</button>
+    </header>
+
+    <main class="principal">
+        
+        <aside class="perfil">
+            <div class="avatar">
+                <img src="IMAGENES/vendedorjsjs.jpeg" alt="Foto" class="foto">
+                <label for="nuevaFoto" class="cambiar">Cambiar foto</label>
+                <input type="file" id="nuevaFoto" class="oculto" accept="image/*">
+            </div>
+            
+            <h2 class="nombre">Juan Pérez</h2>
+            <p class="correo">juan.vendedor@ipn.mx</p>
+            <span class="grado">Vendedor ESCOM</span>
+            
+            <div class="biografia">
+                <h3 class="subtitulo">Sobre mí</h3>
+                <form action="#" class="actualizar">
+                    <textarea class="presentacion" placeholder="Ej. Estudiante de 6to semestre. Vendo material de electrónica y libros en buen estado..." required>Estudiante de 6to semestre. Vendo componentes electrónicos y libros de mate.</textarea>
+                    <button type="submit" class="guardar">Guardar</button>
+                </form>
+            </div>
+
+            <div class="whatsapp">
+                <h3 class="subtitulo">Tu WhatsApp</h3>
+                <p class="nota">Los compradores usarán este número</p>
+                <form action="#" class="actualizar">
+                    <input type="tel" class="celular" value="55 1234 5678" required>
+                    <button type="submit" class="guardar">Actualizar</button>
+                </form>
+            </div>
+            
+            <button class="volver" onclick="window.location.href='INICIO.html'">← Regresar al Inicio</button>
+        </aside>
+
+        <div class="detalles">
+            
+            <div class="bloques">
+                <section class="tarjeta">
+                    <h3 class="titulo">Productos en Venta</h3>
+                    <div class="catalogo">
+                        <div class="renglon">
+                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <div class="info">
+                                <h4>iPhone 17e</h4>
+                                <p class="costo">$18,500 MXN</p>
+                            </div>
+                            <button class="quitar">✖</button>
+                        </div>
+                        <div class="renglon">
+                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <div class="info">
+                                <h4>Bata de Laboratorio</h4>
+                                <p class="costo">$250 MXN</p>
+                            </div>
+                            <button class="quitar">✖</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="tarjeta">
+                    <h3 class="titulo">Productos Apartados</h3>
+                    <div class="catalogo">
+                        <div class="renglon destacado">
+                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <div class="info">
+                                <h4>Arduino Mega</h4>
+                                <p class="comprador">Apartado por: Emmanuel R.</p>
+                            </div>
+                            <button class="revisar">Ver</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="tarjeta publicar">
+                <h3 class="titulo">Subir Nuevo Producto</h3>
+                <form action="#" method="POST" class="formulario">
+                    <div class="division">
+                        <div class="campo">
+                            <label>Nombre del artículo</label>
+                            <input type="text" placeholder="Ej. Protoboard grande" required>
+                        </div>
+                        <div class="campo">
+                            <label>Precio (MXN)</label>
+                            <input type="number" placeholder="Ej. 150" required>
+                        </div>
+                    </div>
+
+                    <div class="division">
+                        <div class="campo">
+                            <label for="categoria">Categoría</label>
+                            <select id="categoria" onchange="filtrarSubcategorias()" required>
+                                <option value="" disabled selected>Selecciona una categoría</option>
+                                <option value="electronica">Electrónica y Componentes</option>
+                                <option value="computacion">Equipo de Cómputo y Software</option>
+                                <option value="academicos">Libros y Papelería</option>
+                                <option value="laboratorio">Material de Laboratorio</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="subcategoria">Subcategoría</label>
+                            <select id="subcategoria" required>
+                                <option value="" disabled selected>Selecciona primero una categoría</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="division">
+                        <div class="campo">
+                            <label>Imagen principal (Portada)</label>
+                            <input type="file" class="archivo" accept="image/*" required>
+                        </div>
+                        <div class="campo">
+                            <label>Capturas adicionales (Múltiples)</label>
+                            <input type="file" class="archivo" accept="image/*" multiple>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label>Video demostrativo (Opcional)</label>
+                        <input type="file" class="archivo" accept="video/*">
+                    </div>
+
+                    <div class="campo">
+                        <label>Descripción y detalles</label>
+                        <textarea placeholder="Describe el estado de tu producto..." required></textarea>
+                    </div>
+                    <button type="submit" class="mandar">Publicar Artículo</button>
+                </form>
+            </section>
+
+            <section class="tarjeta ayuda">
+                <h3 class="titulo">Soporte Técnico</h3>
+                <p class="explicacion">¿Problemas con un comprador o error en tus publicaciones? Mándanos mensaje.</p>
+                
+                <form action="#" method="POST" class="formulario">
+                    <div class="campo">
+                        <label>Asunto</label>
+                        <input type="text" placeholder="Ej. Un comprador no responde..." required>
+                    </div>
+                    <div class="campo">
+                        <label>Descripción</label>
+                        <textarea placeholder="Explica tu problema..." required></textarea>
+                    </div>
+                    <button type="submit" class="mandar">Enviar Queja</button>
+                </form>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        const subcategorias = {
+            electronica: [
+                { value: 'microcontroladores', texto: 'Arduinos y Microcontroladores' },
+                { value: 'prototipado', texto: 'Protoboards y Jumpers' },
+                { value: 'componentes', texto: 'Componentes (Resistencias, LEDs, etc.)' },
+                { value: 'herramientas', texto: 'Herramientas (Cautín, Multímetro)' }
+            ],
+            computacion: [
+                { value: 'laptops', texto: 'Laptops y Computadoras' },
+                { value: 'perifericos', texto: 'Teclados, Mouses y Monitores' },
+                { value: 'componentes_pc', texto: 'RAM, Almacenamiento y Tarjetas' }
+            ],
+            academicos: [
+                { value: 'libros', texto: 'Libros y Literatura Técnica' },
+                { value: 'calculadoras', texto: 'Calculadoras Científicas' },
+                { value: 'utiles', texto: 'Papelería y Dibujo Técnico' }
+            ],
+            laboratorio: [
+                { value: 'vestimenta', texto: 'Batas y Goggles de protección' },
+                { value: 'kits_quimica', texto: 'Kits / Material de Química' }
+            ]
+        };
+
+        function filtrarSubcategorias() {
+            const categoriaSeleccionada = document.getElementById('categoria').value;
+            const comboSubcategoria = document.getElementById('subcategoria');
+
+            comboSubcategoria.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
+
+            if (subcategorias[categoriaSeleccionada]) {
+                subcategorias[categoriaSeleccionada].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.value;
+                    option.textContent = sub.texto;
+                    comboSubcategoria.appendChild(option);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
