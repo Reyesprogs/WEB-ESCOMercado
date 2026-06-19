@@ -59,7 +59,6 @@ require 'conexion.php';
                 <div id="contenedor-dinamico" class="fila-larga">
                     
                     <?php 
-                    // Solicitamos los productos a la Base de Datos
                     $query_todos = "SELECT * FROM productos WHERE estado = 'disponible' ORDER BY fecha_publicacion DESC";
                     $resultado_todos = mysqli_query($conexion, $query_todos);
                     
@@ -67,15 +66,15 @@ require 'conexion.php';
                         while($producto = mysqli_fetch_assoc($resultado_todos)) { 
                     ?>
 
-                    <button class="boton-item" onclick="window.location.href='PRODUCTO1.php?id=<?php echo $producto['id_producto']; ?>'">
+                    <button class="boton-item" onclick="window.location.href='PRODUCTO1.html?id=<?php echo $producto['id_producto']; ?>'" style="background: none; border: none; padding: 0; cursor: pointer; text-align: left;">
                         <div class="category-card">
-                            <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="Producto">
+                            <img src="<?php echo htmlspecialchars($producto['ruta_imagen_principal']); ?>" alt="<?php echo htmlspecialchars($producto['titulo']); ?>">
                             <div class="card-content">
                                 <div>
-                                    <span class="card-tag"><?php echo $producto['categoria']; ?></span>
-                                    <h3 class="card-title"><?php echo $producto['titulo']; ?></h3>
+                                    <span class="card-tag"><?php echo htmlspecialchars($producto['categoria']); ?></span>
+                                    <h3 class="card-title"><?php echo htmlspecialchars($producto['titulo']); ?></h3>
                                 </div>
-                                <p class="card-subtitle" style="font-weight: bold; font-size: 18px; margin-top: 10px;">$<?php echo $producto['precio']; ?> MXN</p>
+                                <p class="card-subtitle" style="font-weight: bold; font-size: 18px; margin-top: 10px;">$<?php echo htmlspecialchars($producto['precio']); ?> MXN</p>
                             </div>
                         </div>
                     </button>
@@ -83,7 +82,7 @@ require 'conexion.php';
                     <?php 
                         } 
                     } else {
-                        echo "<p style='color: white; padding: 20px; font-family: sans-serif;'>No hay productos disponibles.</p>";
+                        echo "<p style='color: white; margin: 20px; font-family: sans-serif;'>No hay productos disponibles en este momento.</p>";
                     }
                     ?>
 
@@ -92,18 +91,17 @@ require 'conexion.php';
             
             <button onclick="moverDerecha()" class="flecha"> ❯ </button>
         </div>
+    </main>
+    <script>
+        const visor = document.getElementById('visor');
 
-        <script>
-            const visor = document.getElementById('visor');
+        function moverDerecha() {
+            visor.scrollLeft += visor.offsetWidth;
+        }
 
-            function moverDerecha() {
-                // Al dar clic, desliza exactamente el ancho del visor (2 columnas)
-                visor.scrollLeft += visor.offsetWidth; 
-            }
-
-            function moverIzquierda() {
-                visor.scrollLeft -= visor.offsetWidth;
-            }
-        </script>
+        function moverIzquierda() {
+            visor.scrollLeft -= visor.offsetWidth;
+        }
+    </script>
 </body>
 </html>

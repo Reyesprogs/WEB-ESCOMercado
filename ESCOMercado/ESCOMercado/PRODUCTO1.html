@@ -1,25 +1,31 @@
-<?php session_start(); ?>
-<?php
+<?php 
+session_start();
 require 'conexion.php';
-// Recibir el ID de la URL (Ej. PRODUCTO1.html?id=4), si no existe, mostramos el 1
-$id_producto = isset($_GET['id']) ? intval($_GET['id']) : 1; 
 
-$query_prod = "SELECT p.*, u.nombres as nombre, u.apellidos, u.correo, u.ruta_foto_perfil 
+$id_producto = isset($_GET['id']) ? intval($_GET['id']) : 0; 
+
+if($id_producto <= 0){
+    die("<h2 style='color:white; text-align:center; font-family:sans-serif; margin-top:50px;'>Producto no válido. <a href='PRODUCTOS.html'>Volver al catálogo</a></h2>");
+}
+
+$query_prod = "SELECT p.*, u.nombres as nombre, u.apellidos, u.correo, u.ruta_foto_perfil, u.username 
                FROM productos p JOIN usuarios u ON p.id_vendedor = u.id_usuario 
                WHERE p.id_producto = $id_producto";
 $resultado_prod = mysqli_query($conexion, $query_prod);
+
+if(mysqli_num_rows($resultado_prod) == 0) {
+    die("<h2 style='color:white; text-align:center; font-family:sans-serif; margin-top:50px;'>El producto solicitado no existe. <a href='PRODUCTOS.html'>Volver al catálogo</a></h2>");
+}
+
 $producto = mysqli_fetch_assoc($resultado_prod);
 
-// Organizar datos del vendedor para el HTML
 $vendedor = [
+    'username' => $producto['username'],
     'nombre' => $producto['nombre'],
     'apellidos' => $producto['apellidos'],
     'correo' => $producto['correo'],
     'ruta_foto_perfil' => $producto['ruta_foto_perfil']
 ];
-
-// Si tuvieras tabla de imágenes extra, la consulta iría aquí
-$imagenes_extra = []; 
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -29,7 +35,7 @@ $imagenes_extra = [];
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $producto['titulo']; ?> - ESCOMercado</title>
+    <title><?php echo htmlspecialchars($producto['titulo']); ?> - ESCOMercado</title>
     <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
     <link rel="stylesheet" href="CSS/css_producto2.css">
 </head>
@@ -68,61 +74,114 @@ $imagenes_extra = [];
         </div>
     </header>
     
-    <main>
-        <div class="container">
-            <h2 class="main-title"><?php echo $producto['titulo']; ?></h2>
+    <main style="padding: 20px; max-width: 1200px; margin: 0 auto; font-family: 'Plus Jakarta Sans', sans-serif;">
+        <div class="container" style="margin-bottom: 30px;">
+            <h2 class="main-title" style="text-align: center; font-size: 28px; margin-bottom: 5px;"><?php echo htmlspecialchars($producto['titulo']); ?></h2>
+            <p style="text-align: center; color: #9CA3AF; margin: 0; font-weight: 600;">Categoría: <?php echo htmlspecialchars(ucfirst($producto['categoria']) . ' > ' . ucfirst($producto['subcategoria'])); ?></p>
         </div>
         
-        <div class="prod">
-            <video controls src="<?php echo $producto['ruta_video']; ?>"></video>
-            <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="Imagen Principal">
+        <div class="media-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 40px; background: #111827; padding: 20px; border-radius: 16px; border: 1px solid #1F2937;">
             
-            <div class="prod">
-                <button class="btn-img">
-                    <img src="<?php echo $img['ruta']; ?>" alt="Imagen Extra">
-                </button>
+            <div class="media-video" style="flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h4 style="color: #6B7280; margin-bottom: 15px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Video</h4>
+                <?php if(!empty($producto['ruta_video'])): ?>
+                    <video controls src="<?php echo htmlspecialchars($producto['ruta_video']); ?>" style="width: 100%; max-height: 300px; border-radius: 12px; border: 2px solid #374151; background: black;"></video>
+                <?php else: ?>
+                    <div style="width: 100%; height: 250px; background: #1F2937; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #4B5563; border: 2px dashed #374151;">
+                        Sin video disponible
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="media-main" style="flex: 2; min-width: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h4 style="color: #6B7280; margin-bottom: 15px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Vista Principal</h4>
+                <img id="imagen-principal" src="<?php echo htmlspecialchars($producto['ruta_imagen_principal']); ?>" alt="Imagen Principal" style="width: 100%; height: 350px; object-fit: contain; border-radius: 12px; border: 2px solid #374151; background: #0F172A; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            </div>
+
+            <div class="media-thumbnails" style="flex: 1; min-width: 150px; display: flex; flex-direction: column; align-items: center;">
+                <h4 style="color: #6B7280; margin-bottom: 15px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Capturas</h4>
+                <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; align-items: center;">
+                    
+                    <button type="button" onclick="document.getElementById('imagen-principal').src='<?php echo htmlspecialchars($producto['ruta_imagen_principal']); ?>'" style="background: transparent; border: 2px solid #3B82F6; border-radius: 8px; cursor: pointer; padding: 2px; transition: 0.3s; width: 90px; height: 90px;" onmouseover="this.style.borderColor='#60A5FA'" onmouseout="this.style.borderColor='#3B82F6'">
+                        <img src="<?php echo htmlspecialchars($producto['ruta_imagen_principal']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                    </button>
+
+                    <button type="button" onclick="document.getElementById('imagen-principal').src='IMAGENES/LOGO_ESCOMercado.jpg'" style="background: transparent; border: 2px solid #374151; border-radius: 8px; cursor: pointer; padding: 2px; transition: 0.3s; width: 90px; height: 90px;" onmouseover="this.style.borderColor='#60A5FA'" onmouseout="this.style.borderColor='#374151'">
+                        <img src="IMAGENES/LOGO_ESCOMercado.jpg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; background: #1F2937;">
+                    </button>
+                    
                 </div>
+            </div>
         </div>
 
-        <div class="prod2">
-            <div class="img_vendedor">
-                <h3>VENDEDOR</h3> <br>
-                <img style="text-align: center;" src="<?php echo $vendedor['ruta_foto_perfil']; ?>" alt="Foto vendedor">
-                <h4>Nombre:</h4>
-                <p><?php echo $vendedor['nombre'] . ' ' . $vendedor['apellidos']; ?></p>
-                <div class="contacto-vendedor">
-                    <h3>Contactar vendedor:</h3>
-                    <a href="mailto:<?php echo $vendedor['correo']; ?>">
-                        <img src="IMAGENES/carta.png" alt="Enviar correo" style="width: 40px; transition: 0.3s;">
+        <div class="info-container" style="display: flex; flex-wrap: wrap; gap: 30px;">
+            
+            <div class="vendedor-compacto" style="flex: 1; min-width: 280px; background: #111827; border: 1px solid #1F2937; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 15px; height: max-content;">
+                <h3 style="color: #F3F4F6; margin: 0; font-size: 16px; border-bottom: 1px solid #374151; padding-bottom: 10px;">Vendedor</h3>
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <img src="<?php echo htmlspecialchars($vendedor['ruta_foto_perfil']); ?>" alt="Foto vendedor" style="width: 55px; height: 55px; object-fit: cover; border-radius: 50%; border: 2px solid #3B82F6;">
+                    <div>
+                        <h4 style="color: white; margin: 0 0 4px 0; font-size: 15px;"><?php echo htmlspecialchars($vendedor['username']); ?></h4>
+                        <span style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;">Confiable</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <button onclick="window.location.href='PERFIL_VENDEDOR.html?user=<?php echo urlencode($vendedor['username']); ?>'" style="width: 100%; padding: 10px; font-size: 13px; font-weight: bold; background-color: transparent; border: 1px solid #3B82F6; color: #3B82F6; border-radius: 8px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.backgroundColor='rgba(59, 130, 246, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                        Ver más detalles
+                    </button>
+                    <a href="mailto:<?php echo htmlspecialchars($vendedor['correo']); ?>" style="text-decoration: none; width: 100%;">
+                        <button style="width: 100%; padding: 10px; font-size: 13px; font-weight: bold; background-color: #1F2937; border: 1px solid #374151; color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;" onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='#1F2937'">
+                            ✉️ Contactar por Correo
+                        </button>
                     </a>
                 </div>
             </div>
-            
-            <div class="descripcion">
-                <h3>Disponible: </h3> 
-                <p><?php echo $producto['stock']; ?> en Stock (Entrega en ESCOM)</p>
-                
-                <h3>Descripción / Detalles:</h3>
-                <p style="color: #E5E7EB; line-height: 1.6; margin-bottom: 20px;">
-                    <?php echo nl2br($producto['descripcion']); ?>
-                </p>
 
-                <h3>Precio:</h3> 
-                <p class="precio-destacado">$<?php echo $producto['precio']; ?> MXN</p>
+            <div class="detalles-producto" style="flex: 2; min-width: 320px; background: #111827; border: 1px solid #1F2937; border-radius: 16px; padding: 25px; display: flex; flex-direction: column; gap: 25px;">
                 
-                <form action="procesar_carrito.php" method="POST">
-                    <input type="hidden" name="id_producto" value="<?php echo $producto['id_producto']; ?>">
-                    <div style="margin-bottom: 15px; color: white;">
-                        <label>Cantidad a apartar:</label>
-                        <input type="number" name="cantidad" value="1" min="1" max="<?php echo $producto['stock']; ?>" style="width: 60px; padding: 5px; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h3 style="color: #9CA3AF; font-size: 13px; margin: 0 0 5px 0; text-transform: uppercase;">Precio</h3>
+                        <p style="color: #10B981; font-size: 36px; font-weight: 800; margin: 0;">$<?php echo htmlspecialchars($producto['precio']); ?> <span style="font-size: 18px; color: #6B7280; font-weight: 600;">MXN</span></p>
                     </div>
-                    <center><button type="submit" class="btn-apartar">Apartar</button></center>
+                    
+                    <div style="text-align: right;">
+                        <h3 style="color: #9CA3AF; font-size: 13px; margin: 0 0 8px 0; text-transform: uppercase;">Disponibilidad</h3>
+                        <?php if($producto['stock'] > 0): ?>
+                            <span style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10B981; color: #10B981; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 14px;">✓ <?php echo htmlspecialchars($producto['stock']); ?> en Stock</span>
+                        <?php else: ?>
+                            <span style="background: rgba(239, 68, 68, 0.1); border: 1px solid #EF4444; color: #EF4444; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 14px;">✗ Agotado</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: #F3F4F6; font-size: 16px; margin: 0 0 12px 0;">Descripción del Producto</h3>
+                    <div style="color: #D1D5DB; line-height: 1.6; font-size: 15px; background: #1F2937; padding: 18px; border-radius: 12px; border: 1px solid #374151; margin: 0;">
+                        <?php echo nl2br(htmlspecialchars($producto['descripcion'])); ?>
+                    </div>
+                </div>
+
+                <form action="procesar_carrito.php" method="POST" style="margin-top: auto; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <input type="hidden" name="id_producto" value="<?php echo $producto['id_producto']; ?>">
+                    
+                    <div style="display: flex; align-items: center; gap: 10px; background: #1F2937; padding: 8px 15px; border-radius: 8px; border: 1px solid #374151;">
+                        <label style="color: #9CA3AF; font-weight: bold; font-size: 14px;">Cantidad:</label>
+                        <input type="number" name="cantidad" value="1" min="1" max="<?php echo $producto['stock']; ?>" style="width: 60px; padding: 6px; border-radius: 6px; border: 1px solid #4B5563; background: #111827; color: white; font-weight: bold; text-align: center; outline: none;" <?php if($producto['stock'] <= 0) echo 'disabled'; ?>>
+                    </div>
+                    
+                    <button type="submit" class="btn-apartar" style="flex: 1; min-width: 200px; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; background-color: #3B82F6; color: white; border: none; cursor: pointer; transition: 0.2s;" 
+                        <?php if($producto['stock'] <= 0) echo 'disabled style="background-color: #4B5563; color: #9CA3AF; cursor: not-allowed;"'; else echo 'onmouseover="this.style.backgroundColor=\'#2563EB\'" onmouseout="this.style.backgroundColor=\'#3B82F6\'"'; ?>>
+                        🛒 Apartar Producto
+                    </button>
                 </form>
             </div>
         </div>
         
-        <div class="container2">
-            <button class="btn-nav" onclick="history.back()">REGRESAR</button>
+        <div class="container2" style="margin-top: 30px; text-align: center;">
+            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'" style="padding: 10px 30px;">REGRESAR AL CATÁLOGO</button>
         </div>    
     </main>
 </body>

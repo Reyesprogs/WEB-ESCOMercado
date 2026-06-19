@@ -2,34 +2,43 @@
 session_start();
 require 'conexion.php';
 
-if(!isset($_SESSION['usuario_id'])) {
-    echo "<script>alert('Debes iniciar sesión para ver tu carrito'); window.location.href='ACCESO.html';</script>";
-    exit();
-}
+$carrito = isset($_SESSION['carrito']) ? $_SESSION['carrito'] : [];
+$pedidos_por_vendedor = [];
 
-$id_comprador_actual = $_SESSION['usuario_id']; // Ahora sí, usa el ID del usuario conectado
+// Si hay productos en el carrito, hacemos la consulta agrupada
+if (!empty($carrito)) {
+    // Extraemos todos los IDs de los productos en el carrito
+    $ids_productos = implode(',', array_map('intval', array_keys($carrito)));
+    
+    // Consultamos los productos y los datos de su vendedor (asumimos que tienes un campo 'clabe' en 'usuarios')
+    // Quitamos u.clabe de la primera línea de la consulta
+$query = "SELECT p.*, u.username as vendedor_nombre, u.id_usuario as id_vendedor 
+          FROM productos p 
+          JOIN usuarios u ON p.id_vendedor = u.id_usuario 
+          WHERE p.id_producto IN ($ids_productos)";
+          
+$resultado = mysqli_query($conexion, $query);
 
-$query_carrito = "SELECT c.id_carrito, c.cantidad, p.titulo as titulo_producto, p.precio, 
-                  p.ruta_imagen_principal as ruta_imagen, u.nombres as nombre_vendedor 
-                  FROM carrito_compras c 
-                  JOIN productos p ON c.id_producto = p.id_producto 
-                  JOIN usuarios u ON p.id_vendedor = u.id_usuario 
-                  WHERE c.id_comprador = $id_comprador_actual";
-$carrito_resultado = mysqli_query($conexion, $query_carrito);
-
-$subtotal = 0;
-$total_articulos = 0;
-$hay_productos = mysqli_num_rows($carrito_resultado) > 0;
-
-if ($hay_productos) {
-    while($item = mysqli_fetch_assoc($carrito_resultado)) {
-        $subtotal += ($item['precio'] * $item['cantidad']);
-        $total_articulos += $item['cantidad'];
+while ($prod = mysqli_fetch_assoc($resultado)) {
+    $id_vendedor = $prod['id_vendedor'];
+    $prod['cantidad_carrito'] = $carrito[$prod['id_producto']];
+    $prod['subtotal'] = $prod['precio'] * $prod['cantidad_carrito'];
+    
+    // Si el vendedor aún no está en el arreglo, lo creamos
+    if (!isset($pedidos_por_vendedor[$id_vendedor])) {
+        $pedidos_por_vendedor[$id_vendedor] = [
+            'vendedor_nombre' => $prod['vendedor_nombre'],
+            // Ponemos una CLABE fija de prueba directamente desde PHP
+            'clabe' => '012 345 6789 0123 4567', 
+            'productos' => [],
+            'total_vendedor' => 0
+        ];
     }
-    $total_pagar = $subtotal;
-    mysqli_data_seek($carrito_resultado, 0); // Reinicia para poder leerlos abajo
-} else {
-    $total_pagar = 0;
+        
+        // Agregamos el producto a la lista de este vendedor y sumamos al total
+        $pedidos_por_vendedor[$id_vendedor]['productos'][] = $prod;
+        $pedidos_por_vendedor[$id_vendedor]['total_vendedor'] += $prod['subtotal'];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -40,21 +49,38 @@ if ($hay_productos) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARRITO - ESCOMercado</title>
+    <title>Mi Carrito - ESCOMercado</title>
     <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
     <link rel="stylesheet" href="CSS/css_carrito.css">
+    <style>
+        /* Estilos integrados para modernizar la vista del carrito */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030712; color: white; margin: 0; }
+        .cart-container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .vendedor-group { background: #111827; border: 1px solid #1F2937; border-radius: 12px; margin-bottom: 40px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .vendedor-header { background: #1E3A8A; padding: 15px 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid #1F2937; }
+        .producto-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #1F2937; }
+        .producto-info { display: flex; gap: 15px; align-items: center; }
+        .producto-info img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .checkout-section { padding: 20px; background: #0F172A; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #9CA3AF; font-size: 14px; font-weight: bold; }
+        .form-control { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #374151; background: #1F2937; color: white; font-family: 'Plus Jakarta Sans'; box-sizing: border-box; }
+        .btn-confirmar { width: 100%; padding: 12px; background: #10B981; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-confirmar:hover { background: #059669; }
+    </style>
 </head>
 <body>
-    <header id="navbar">
+    <!-- HEADER -->
+        <header id="navbar">
         <div style="display: flex; gap: 15px;">
             <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
-            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
         </div>
         
         <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
             <center>
                 <img src="IMAGENES/ESCOMercado.png" id="img-logo" class="img-logo" alt="Logo">
             </center>
+            <span class="logo-subtitle">ESCOMercado</span>
         </div>
         
         <div style="display: flex; gap: 15px; align-items: center;">
@@ -72,71 +98,116 @@ if ($hay_productos) {
                 <?php } ?>
                 
                 <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
-            
             <?php } else { ?>
                 <button class="btn-nav" onclick="window.location.href='ACCESO.html'">Acceder</button>
             <?php } ?>
         </div>
     </header>
 
-    <main>
-        <div class="container">
-            <h2 class="main-title">Tu Carrito de Compras</h2>
-        </div>
+    <main class="cart-container">
+        <h1 style="text-align: center; margin-bottom: 40px; font-size: 32px;">Tu Carrito de Compras</h1>
 
-        <div class="cart-wrapper">
-            <section class="cart-2">
-                <?php if(!$hay_productos) { ?>
-                    <h3 style="color: #E5E7EB; text-align: center; margin-top: 50px;">Tu carrito está vacío.</h3>
-                <?php } else { 
-                    while($item = mysqli_fetch_assoc($carrito_resultado)) { 
-                ?>
-
-                <div class="cart">
-                    <img src="<?php echo $item['ruta_imagen']; ?>" alt="Producto" class="item-img">
-                    <div class="item-info">
-                        <h3 class="item-title"><?php echo $item['titulo_producto']; ?></h3>
-                        <p class="item-v">Vendedor: <?php echo $item['nombre_vendedor']; ?></p>
+        <?php if(empty($pedidos_por_vendedor)): ?>
+            <div style="text-align: center; background: #111827; padding: 50px; border-radius: 12px; border: 1px solid #1F2937;">
+                <h2 style="color: #9CA3AF;">Tu carrito está vacío</h2>
+                <br>
+                <button onclick="window.location.href='PRODUCTOS.html'" style="padding: 10px 20px; background: #3B82F6; color: white; border: none; border-radius: 8px; cursor: pointer;">Ir al catálogo</button>
+            </div>
+        <?php else: ?>
+            
+            <!-- Iteramos sobre cada vendedor -->
+            <?php foreach($pedidos_por_vendedor as $id_vend => $grupo): ?>
+                <div class="vendedor-group">
+                    <div class="vendedor-header">
+                        📦 Vendedor: <?php echo htmlspecialchars($grupo['vendedor_nombre']); ?>
                     </div>
-                    <div class="item-cu">
-                        <p style="color: white; font-size: 14px;">Cant: <?php echo $item['cantidad']; ?></p>
+                    
+                    <!-- Lista de productos de este vendedor -->
+                    <div style="padding: 10px 0;">
+                        <?php foreach($grupo['productos'] as $prod): ?>
+                            <div class="producto-item">
+                                <div class="producto-info">
+                                    <img src="<?php echo htmlspecialchars($prod['ruta_imagen_principal']); ?>" alt="Producto">
+                                    <div>
+                                        <h4 style="margin: 0; font-size: 16px;"><?php echo htmlspecialchars($prod['titulo']); ?></h4>
+                                        <p style="margin: 5px 0 0 0; color: #9CA3AF; font-size: 13px;">Cant: <?php echo $prod['cantidad_carrito']; ?> x $<?php echo $prod['precio']; ?></p>
+                                    </div>
+                                </div>
+                                <div style="font-weight: bold; font-size: 18px; color: #60A5FA;">
+                                    $<?php echo number_format($prod['subtotal'], 2); ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <div class="item-pricing">
-                        <p class="price">$<?php echo $item['precio']; ?> MXN</p>
+
+                    <!-- Sección de Pago Exclusiva de este Vendedor -->
+                    <div class="checkout-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <span style="font-size: 18px; color: #9CA3AF;">Total a pagar:</span>
+                            <span style="font-size: 24px; font-weight: 800; color: #10B981;">$<?php echo number_format($grupo['total_vendedor'], 2); ?> MXN</span>
+                        </div>
+                        
+                        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3B82F6; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                            <p style="margin: 0 0 5px 0; color: #9CA3AF; font-size: 14px;">Realiza tu transferencia a la siguiente CLABE:</p>
+                            <h2 style="margin: 0; color: #60A5FA; letter-spacing: 2px; font-family: monospace;"><?php echo htmlspecialchars($grupo['clabe']); ?></h2>
+                        </div>
+
+                        <!-- Formulario de Checkout (enctype multipart para subir la imagen) -->
+                        <form action="confirmar_pago.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id_vendedor" value="<?php echo $id_vend; ?>">
+                            <input type="hidden" name="total_pago" value="<?php echo $grupo['total_vendedor']; ?>">
+                            
+                            <div class="form-group">
+                                <label>1. Sube la evidencia de tu transferencia (Captura)</label>
+                                <input type="file" name="comprobante" class="form-control" accept="image/png, image/jpeg, image/jpg" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>2. Lugar de entrega en ESCOM</label>
+                                <select name="lugar_entrega" class="form-control" id="select-lugar-<?php echo $id_vend; ?>" onchange="mostrarInputSalon(<?php echo $id_vend; ?>)" required>
+                                    <option value="" disabled selected>Selecciona un lugar...</option>
+                                    <option value="salon">Salón (Especificar)</option>
+                                    <option value="area_verde">Área Verde</option>
+                                    <option value="palapas_ia">Palapas de IA</option>
+                                    <option value="palapas_gestion">Palapas de Gestión</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Input oculto que aparece si seleccionan "Salón" -->
+                            <div class="form-group" id="input-salon-<?php echo $id_vend; ?>" style="display: none;">
+                                <label>¿Qué salón? (Ej. 1101, 2204)</label>
+                                <input type="text" name="salon_especifico" class="form-control" placeholder="Escribe el número del salón">
+                            </div>
+
+                            <div class="form-group">
+                                <label>3. Horario de entrega</label>
+                                <input type="time" name="horario_entrega" class="form-control" required>
+                            </div>
+
+                            <button type="submit" class="btn-confirmar">✅ Confirmar Pago a este Vendedor</button>
+                        </form>
                     </div>
                 </div>
-
-                <?php 
-                    } // Cierra el while
-                } // Cierra el else
-                ?>
-            </section>
-
-            <aside class="cart-2">
-                <h3 class="title-1">Resumen de Compra</h3>
-                <div class="row">
-                    <span>Subtotal (<?php echo $total_articulos; ?> productos)</span>
-                    <span>$<?php echo $subtotal; ?> MXN</span>
-                </div>
-                <div class="row">
-                    <span>Cargos por entrega</span>
-                    <span>Gratis en ESCOM</span>
-                </div>
-                <hr class="summary-divider">
-                <div class="summary-row total-row">
-                    <span>Total</span>
-                    <span>$<?php echo $total_pagar; ?> MXN</span>
-                </div>
-                
-                <form action="procesar_pago.php" method="POST">
-                    <button type="submit" class="btn-checkout">Proceder al Pago</button>
-                </form>
-
-                <center>
-                    <button class="btn-continue" onclick="window.location.href='PRODUCTOS.html'">Seguir comprando</button>
-                </center>
-            </aside>
-        </div>
+            <?php endforeach; ?>
+            
+        <?php endif; ?>
     </main>
+
+    <script>
+        // Función para mostrar el input de salón si se selecciona esa opción
+        function mostrarInputSalon(id_vendedor) {
+            var select = document.getElementById('select-lugar-' + id_vendedor);
+            var inputSalon = document.getElementById('input-salon-' + id_vendedor);
+            
+            if (select.value === 'salon') {
+                inputSalon.style.display = 'block';
+                inputSalon.querySelector('input').setAttribute('required', 'true');
+            } else {
+                inputSalon.style.display = 'none';
+                inputSalon.querySelector('input').removeAttribute('required');
+                inputSalon.querySelector('input').value = '';
+            }
+        }
+    </script>
 </body>
 </html>

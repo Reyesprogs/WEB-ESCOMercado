@@ -1,16 +1,57 @@
-<?php session_start(); ?>
 <?php
+session_start();
 require 'conexion.php';
-$categoria_actual = "electronica"; // Puedes cambiar esto a 'computacion', 'academicos', etc.
-$nombre_categoria = "Electrónica y Componentes";
 
-$query_cat = "SELECT * FROM productos WHERE categoria = '$categoria_actual' AND estado = 'disponible'";
-$productos_categoria = mysqli_query($conexion, $query_cat);
+// Si el usuario no ha iniciado sesión, lo mandamos al login
+if(!isset($_SESSION['usuario_id'])) {
+    header("Location: ACCESO.html");
+    exit();
+}
 
-$query_vend = "SELECT DISTINCT u.username, u.boleta, u.ruta_foto_perfil as ruta_foto 
-               FROM usuarios u JOIN productos p ON u.id_usuario = p.id_vendedor 
-               WHERE p.categoria = '$categoria_actual'";
-$vendedore<!DOCTYPE html>
+$id_usuario = $_SESSION['usuario_id'];
+
+// 1. Obtener datos del usuario actual
+$query_usuario = "SELECT * FROM usuarios WHERE id_usuario = $id_usuario";
+$resultado_usuario = mysqli_query($conexion, $query_usuario);
+$usuario = mysqli_fetch_assoc($resultado_usuario);
+
+// 2. VENTAS: Obtener los productos que este vendedor tiene activos
+$q_mis_productos = "SELECT * FROM productos WHERE id_vendedor = $id_usuario AND estado != 'vendido'";
+$mis_productos = mysqli_query($conexion, $q_mis_productos);
+
+// 3. VENTAS: Obtener pedidos apartados (pendientes de confirmación/entrega)
+$q_apartados = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_principal as ruta_imagen, 
+                       u.username as comprador_user, u.nombres as comp_nombres 
+                FROM pedidos p
+                JOIN productos pr ON p.id_producto = pr.id_producto
+                JOIN usuarios u ON p.id_comprador = u.id_usuario
+                WHERE pr.id_vendedor = $id_usuario AND p.estado_entrega = 'pendiente'";
+$pedidos_apartados = mysqli_query($conexion, $q_apartados);
+
+// 4. COMPRAS: Historial de compras (pedidos propios del usuario)
+$q_pedidos_propios = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_principal as ruta_imagen, u.username as vendedor 
+                      FROM pedidos p 
+                      JOIN productos pr ON p.id_producto = pr.id_producto 
+                      JOIN usuarios u ON pr.id_vendedor = u.id_usuario 
+                      WHERE p.id_comprador = $id_usuario";
+$historial_pedidos = mysqli_query($conexion, $q_pedidos_propios);
+
+// 5. COMPRAS: Mis Favoritos
+$q_favs = "SELECT f.*, pr.titulo as titulo_producto, pr.precio, pr.ruta_imagen_principal as ruta_imagen 
+           FROM favoritos f 
+           JOIN productos pr ON f.id_producto = pr.id_producto 
+           WHERE f.id_comprador = $id_usuario";
+$lista_favoritos = mysqli_query($conexion, $q_favs);
+
+// 6. COMPRAS: Historial de Vendedores (A los que les he comprado)
+$q_mis_vendedores = "SELECT DISTINCT u.id_usuario, u.username, u.ruta_foto_perfil, u.correo 
+                     FROM pedidos p 
+                     JOIN productos pr ON p.id_producto = pr.id_producto 
+                     JOIN usuarios u ON pr.id_vendedor = u.id_usuario 
+                     WHERE p.id_comprador = $id_usuario";
+$historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
+?>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +62,16 @@ $vendedore<!DOCTYPE html>
     <title>Panel de Vendedor - ESCOMercado</title>
     <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
     <link rel="stylesheet" href="CSS/css_vendedor.css">
+    <style>
+        .seccion-compras-titulo {
+            color: #60A5FA; font-family: 'Plus Jakarta Sans', sans-serif; margin-top: 50px; 
+            margin-bottom: 20px; border-bottom: 2px solid #1F2937; padding-bottom: 10px;
+        }
+        .btn-accion { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-aceptar { background: #10B981; } .btn-aceptar:hover { background: #059669; }
+        .btn-regresar { background: #F59E0B; } .btn-regresar:hover { background: #D97706; }
+        .btn-cancelar { background: #EF4444; } .btn-cancelar:hover { background: #DC2626; }
+    </style>
 </head>
 <body>
     
@@ -31,36 +82,38 @@ $vendedore<!DOCTYPE html>
                 <img src="IMAGENES/ESCOMercado.png" class="logo" alt="Logo">
             </center>
         </div>
-        <button class="enlace">Contacto</button>
+        <button class="enlace" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
     </header>
 
     <main class="principal">
         
         <aside class="perfil">
             <div class="avatar">
-                <img src="IMAGENES/vendedorjsjs.jpeg" alt="Foto" class="foto">
+                <img src="<?php echo !empty($usuario['ruta_foto_perfil']) ? htmlspecialchars($usuario['ruta_foto_perfil']) : 'IMAGENES/logosf.png'; ?>" alt="Foto" class="foto">
                 <label for="nuevaFoto" class="cambiar">Cambiar foto</label>
                 <input type="file" id="nuevaFoto" class="oculto" accept="image/*">
             </div>
             
-            <h2 class="nombre">Juan Pérez</h2>
-            <p class="correo">juan.vendedor@ipn.mx</p>
-            <span class="grado">Vendedor ESCOM</span>
+            <h2 class="nombre"><?php echo htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']); ?></h2>
+            <p class="correo"><?php echo htmlspecialchars($usuario['correo']); ?></p>
+            <span class="grado">Vendedor ESCOM - Boleta: <?php echo htmlspecialchars($usuario['boleta']); ?></span>
             
-            <div class="biografia">
-                <h3 class="subtitulo">Sobre mí</h3>
-                <form action="#" class="actualizar">
-                    <textarea class="presentacion" placeholder="Ej. Estudiante de 6to semestre. Vendo material de electrónica y libros en buen estado..." required>Estudiante de 6to semestre. Vendo componentes electrónicos y libros de mate.</textarea>
-                    <button type="submit" class="guardar">Guardar</button>
-                </form>
-            </div>
-
-            <div class="whatsapp">
-                <h3 class="subtitulo">Tu WhatsApp</h3>
-                <p class="nota">Los compradores usarán este número</p>
-                <form action="#" class="actualizar">
-                    <input type="tel" class="celular" value="55 1234 5678" required>
-                    <button type="submit" class="guardar">Actualizar</button>
+            <div class="biografia" style="margin-top: 20px; text-align: left;">
+                <h3 class="subtitulo" style="text-align: center;">Editar Perfil</h3>
+                <form action="actualizar_perfil.php" method="POST" class="actualizar" style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="color: #9CA3AF; font-size: 13px;">Nombres:</label>
+                    <input type="text" name="nombres" class="celular" value="<?php echo htmlspecialchars($usuario['nombres']); ?>" required>
+                    
+                    <label style="color: #9CA3AF; font-size: 13px;">Apellidos:</label>
+                    <input type="text" name="apellidos" class="celular" value="<?php echo htmlspecialchars($usuario['apellidos']); ?>" required>
+                    
+                    <label style="color: #9CA3AF; font-size: 13px;">WhatsApp (Contacto):</label>
+                    <input type="tel" name="telefono" class="celular" value="<?php echo htmlspecialchars($usuario['telefono'] ?? ''); ?>" required>
+                    
+                    <label style="color: #9CA3AF; font-size: 13px;">Sobre mí:</label>
+                    <textarea name="biografia" class="presentacion" required><?php echo htmlspecialchars($usuario['biografia'] ?? ''); ?></textarea>
+                    
+                    <button type="submit" class="guardar" style="margin-top: 10px;">Guardar Cambios</button>
                 </form>
             </div>
             
@@ -69,40 +122,83 @@ $vendedore<!DOCTYPE html>
 
         <div class="detalles">
             
+            <h2 style="color: white; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 20px;">📦 Mi Sección de Ventas</h2>
+            
             <div class="bloques">
                 <section class="tarjeta">
-                    <h3 class="titulo">Productos en Venta</h3>
+                    <h3 class="titulo">Mis Productos en Venta</h3>
                     <div class="catalogo">
+                        <?php 
+                        if($mis_productos && mysqli_num_rows($mis_productos) > 0) {
+                            while($prod = mysqli_fetch_assoc($mis_productos)) { 
+                        ?>
                         <div class="renglon">
-                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
+                            <img src="<?php echo htmlspecialchars($prod['ruta_imagen_principal']); ?>" alt="Item" class="miniatura">
                             <div class="info">
-                                <h4>iPhone 17e</h4>
-                                <p class="costo">$18,500 MXN</p>
+                                <h4><?php echo htmlspecialchars($prod['titulo']); ?></h4>
+                                <p class="costo">$<?php echo htmlspecialchars($prod['precio']); ?> MXN (Stock: <?php echo $prod['stock']; ?>)</p>
                             </div>
                             <button class="quitar">✖</button>
                         </div>
-                        <div class="renglon">
-                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
-                            <div class="info">
-                                <h4>Bata de Laboratorio</h4>
-                                <p class="costo">$250 MXN</p>
-                            </div>
-                            <button class="quitar">✖</button>
-                        </div>
+                        <?php 
+                            }
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos publicados actualmente.</p>";
+                        }
+                        ?>
                     </div>
                 </section>
 
                 <section class="tarjeta">
-                    <h3 class="titulo">Productos Apartados</h3>
+                    <h3 class="titulo">Pedidos de mis Clientes (Apartados)</h3>
                     <div class="catalogo">
-                        <div class="renglon destacado">
-                            <img src="https://via.placeholder.com/60" alt="Item" class="miniatura">
-                            <div class="info">
-                                <h4>Arduino Mega</h4>
-                                <p class="comprador">Apartado por: Emmanuel R.</p>
+                        <?php 
+                        if($pedidos_apartados && mysqli_num_rows($pedidos_apartados) > 0) {
+                            while($apartado = mysqli_fetch_assoc($pedidos_apartados)) { 
+                        ?>
+                        <div class="renglon destacado" style="flex-wrap: wrap;">
+                            <div style="display:flex; width:100%; justify-content:space-between; align-items:center;">
+                                <div class="info" style="display:flex; gap:15px; align-items:center;">
+                                    <img src="<?php echo htmlspecialchars($apartado['ruta_imagen']); ?>" alt="Item" class="miniatura">
+                                    <div>
+                                        <h4><?php echo htmlspecialchars($apartado['titulo_producto']); ?></h4>
+                                        <p class="comprador">Apartado por: <?php echo htmlspecialchars($apartado['comprador_user']); ?></p>
+                                    </div>
+                                </div>
+                                <button class="revisar" onclick="toggleDetalles(<?php echo $apartado['id_pedido']; ?>)">Ver detalles ▼</button>
                             </div>
-                            <button class="revisar">Ver</button>
+                            
+                            <div id="detalles-<?php echo $apartado['id_pedido']; ?>" style="display: none; width: 100%; margin-top: 15px; background: #0F172A; padding: 15px; border-radius: 8px; border: 1px solid #1F2937;">
+                                <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                                    <div style="flex:1; min-width:200px;">
+                                        <h5 style="color:#60A5FA; margin-bottom:10px;">📌 Datos de Entrega</h5>
+                                        <p style="color:#D1D5DB; font-size:13px;">Lugar: <?php echo htmlspecialchars($apartado['zona_entrega']); ?></p>
+                                        <p style="color:#D1D5DB; font-size:13px;">Horario: <?php echo isset($apartado['horario_entrega']) ? htmlspecialchars($apartado['horario_entrega']) : 'Por definir'; ?></p>
+                                        <p style="color:#D1D5DB; font-size:13px;">Cantidad: <?php echo htmlspecialchars($apartado['cantidad']); ?> pieza(s)</p>
+                                        <p style="color:#10B981; font-size:15px; font-weight:bold; margin-top:5px;">Total a pagar: $<?php echo htmlspecialchars($apartado['total']); ?> MXN</p>
+                                    </div>
+                                    <div style="flex:1; min-width:200px; text-align:center;">
+                                        <h5 style="color:#60A5FA; margin-bottom:10px;">📸 Evidencia (Transferencia)</h5>
+                                        <img src="<?php echo isset($apartado['ruta_evidencia']) ? htmlspecialchars($apartado['ruta_evidencia']) : 'https://via.placeholder.com/150'; ?>" alt="Evidencia" style="width:100px; height:auto; border-radius:8px; border:1px solid #374151;">
+                                    </div>
+                                </div>
+                                
+                                <div style="display:flex; gap:10px; margin-top:15px; justify-content:flex-end;">
+                                    <form action="procesar_pedido.php" method="POST" style="margin:0;">
+                                        <input type="hidden" name="id_pedido" value="<?php echo $apartado['id_pedido']; ?>">
+                                        <button type="submit" name="accion" value="aceptar" class="btn-accion btn-aceptar">✅ Aceptar</button>
+                                        <button type="submit" name="accion" value="regresar" class="btn-accion btn-regresar">🔄 Regresar</button>
+                                        <button type="submit" name="accion" value="cancelar" class="btn-accion btn-cancelar">❌ Cancelar</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
+                        <?php 
+                            } 
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>No tienes pedidos pendientes de clientes en este momento.</p>";
+                        }
+                        ?>
                     </div>
                 </section>
             </div>
@@ -132,7 +228,9 @@ $vendedore<!DOCTYPE html>
                                 <option value="" disabled selected>Selecciona una categoría</option>
                                 <option value="electronica">Electrónica y Componentes</option>
                                 <option value="computacion">Equipo de Cómputo</option>
-                                </select>
+                                <option value="academicos">Materiales Académicos</option>
+                                <option value="laboratorio">Equipo de Laboratorio</option>
+                            </select>
                         </div>
                         <div class="campo">
                             <label for="subcategoria">Subcategoría</label>
@@ -153,6 +251,12 @@ $vendedore<!DOCTYPE html>
                         </div>
                     </div>
 
+                    <div class="campo" style="margin-bottom: 15px;">
+                        <label>Imágenes secundarias / Capturas (Opcional)</label>
+                        <input type="file" name="imagenes_secundarias[]" class="archivo" accept="image/*" multiple>
+                        <p style="font-size: 11px; color: #9CA3AF; margin-top: 5px;">* Puedes seleccionar varias imágenes al mismo tiempo dejando presionado 'Ctrl'.</p>
+                    </div>
+
                     <div class="campo">
                         <label>Descripción y detalles</label>
                         <textarea name="desc_prod" placeholder="Describe el estado de tu producto..." required></textarea>
@@ -161,27 +265,99 @@ $vendedore<!DOCTYPE html>
                 </form>
             </section>
 
-            <section class="tarjeta ayuda">
-                <h3 class="titulo">Soporte Técnico</h3>
-                <p class="explicacion">¿Problemas con un comprador o error en tus publicaciones? Mándanos mensaje.</p>
-                
-                <form action="#" method="POST" class="formulario">
-                    <div class="campo">
-                        <label>Asunto</label>
-                        <input type="text" placeholder="Ej. Un comprador no responde..." required>
+            <h2 class="seccion-compras-titulo">🛒 Mi Sección de Compras</h2>
+            
+            <div class="bloques">
+                <section class="tarjeta">
+                    <h3 class="titulo">Mi Historial de Pedidos (Compras propias)</h3>
+                    <div class="lista">
+                        <?php 
+                        if($historial_pedidos && mysqli_num_rows($historial_pedidos) > 0) {
+                            while($pedido = mysqli_fetch_assoc($historial_pedidos)) { 
+                        ?>
+                        <div class="renglon">
+                            <img src="<?php echo htmlspecialchars($pedido['ruta_imagen']); ?>" alt="Item" class="miniatura" style="object-fit: cover;">
+                            <div class="info">
+                                <h4><?php echo htmlspecialchars($pedido['titulo_producto']); ?></h4>
+                                <p style="color:#9CA3AF; font-size: 13px;">Fecha: <?php echo htmlspecialchars($pedido['fecha_compra']); ?> - Vendedor: <?php echo htmlspecialchars($pedido['vendedor']); ?></p>
+                            </div>
+                        </div>
+                        <?php 
+                            } 
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>Aún no tienes pedidos registrados como comprador.</p>";
+                        }
+                        ?>
                     </div>
-                    <div class="campo">
-                        <label>Descripción</label>
-                        <textarea placeholder="Explica tu problema..." required></textarea>
+                </section>
+
+                <section class="tarjeta">
+                    <h3 class="titulo">Vendedores con los que he comprado</h3>
+                    <div class="lista">
+                        <?php 
+                        if($historial_vendedores && mysqli_num_rows($historial_vendedores) > 0) {
+                            while($vend = mysqli_fetch_assoc($historial_vendedores)) { 
+                        ?>
+                        <div class="renglon">
+                            <img src="<?php echo !empty($vend['ruta_foto_perfil']) ? htmlspecialchars($vend['ruta_foto_perfil']) : 'IMAGENES/logosf.png'; ?>" alt="Vendedor" class="miniatura" style="border-radius:50%; object-fit: cover;">
+                            <div class="info">
+                                <h4><?php echo htmlspecialchars($vend['username']); ?></h4>
+                                <p style="color:#9CA3AF; font-size: 13px;">Contacto: <?php echo htmlspecialchars($vend['correo']); ?></p>
+                            </div>
+                            <button onclick="window.location.href='PERFIL_VENDEDOR.html?user=<?php echo urlencode($vend['username']); ?>'" style="background:transparent; color:#60A5FA; border:1px solid #60A5FA; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">Visitar Perfil</button>
+                        </div>
+                        <?php 
+                            } 
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>Aún no le has comprado a nadie en la plataforma.</p>";
+                        }
+                        ?>
                     </div>
-                    <button type="submit" class="mandar">Enviar Queja</button>
-                </form>
+                </section>
+            </div>
+
+            <section class="tarjeta" style="margin-top: 20px;">
+                <h3 class="titulo">Mis Productos Guardados (Favoritos)</h3>
+                <div class="lista">
+                    <?php 
+                    if($lista_favoritos && mysqli_num_rows($lista_favoritos) > 0) {
+                        while($fav = mysqli_fetch_assoc($lista_favoritos)) { 
+                    ?>
+                    <div class="renglon">
+                        <img src="<?php echo htmlspecialchars($fav['ruta_imagen']); ?>" alt="Item" class="miniatura" style="object-fit: cover;">
+                        <div class="info">
+                            <h4><?php echo htmlspecialchars($fav['titulo_producto']); ?></h4>
+                            <p class="costo">$<?php echo htmlspecialchars($fav['precio']); ?> MXN</p>
+                        </div>
+                        <form action="quitar_favorito.php" method="POST">
+                            <input type="hidden" name="id_favorito" value="<?php echo $fav['id_favorito']; ?>">
+                            <button type="submit" class="corazon" style="background: none; border: none; font-size: 20px; cursor: pointer;">❤️</button>
+                        </form>
+                    </div>
+                    <?php 
+                        } 
+                    } else {
+                        echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos en favoritos.</p>";
+                    }
+                    ?>
+                </div>
             </section>
 
         </div>
     </main>
 
     <script>
+        // Función para mostrar y ocultar los detalles del pedido apartado
+        function toggleDetalles(idPedido) {
+            const panel = document.getElementById('detalles-' + idPedido);
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        // Función original de subcategorías
         const subcategorias = {
             electronica: [
                 { value: 'microcontroladores', texto: 'Arduinos y Microcontroladores' },

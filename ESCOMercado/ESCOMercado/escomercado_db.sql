@@ -127,3 +127,11 @@ INSERT INTO favoritos (id_comprador, id_producto) VALUES
 -- 4. Insertar un Historial de Pedido Pasado
 INSERT INTO pedidos (id_comprador, id_producto, cantidad, precio_unitario, total, zona_entrega, estado_entrega) VALUES 
 (1, 2, 1, 550.00, 550.00, 'Las Palapas', 'entregado');
+
+ALTER TABLE usuarios ADD COLUMN clabe VARCHAR(20) DEFAULT '012345678901234567';
+
+ALTER TABLE pedidos 
+ADD COLUMN zona_entrega VARCHAR(100),
+ADD COLUMN horario_entrega TIME,
+ADD COLUMN ruta_evidencia VARCHAR(255),
+ADD COLUMN estado_entrega VARCHAR(50) DEFAULT 'pendiente';
