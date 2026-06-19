@@ -123,31 +123,33 @@ $lista_favoritos = null;
                 </section>
 
                 <section class="tarjeta">
-                    <h3 class="titulo">Productos Guardados (Favoritos)</h3>
+                    <h3 class="titulo">Historial de Vendedores</h3>
                     <div class="lista">
                         <?php 
-                        if(isset($lista_favoritos) && mysqli_num_rows($lista_favoritos) > 0) {
-                            while($fav = mysqli_fetch_assoc($lista_favoritos)) { 
+                        // Mantenemos la variable nula para evitar errores visuales por ahora
+                        $historial_vendedores = null; 
+
+                        if(isset($historial_vendedores) && mysqli_num_rows($historial_vendedores) > 0) {
+                            while($vendedor = mysqli_fetch_assoc($historial_vendedores)) { 
                         ?>
                         <div class="renglon">
-                            <img src="<?php echo $fav['ruta_imagen']; ?>" alt="Item" class="miniatura" style="object-fit: cover;">
+                            <img src="<?php echo $vendedor['ruta_foto']; ?>" alt="Vendedor" class="miniatura" style="object-fit: cover; border-radius: 50%;">
                             <div class="info">
-                                <h4><?php echo $fav['titulo_producto']; ?></h4>
-                                <p class="costo">$<?php echo $fav['precio']; ?> MXN</p>
+                                <h4><?php echo $vendedor['nombres_vendedor']; ?></h4>
+                                <p class="costo" style="color: #94A3B8; font-size: 13px;">Compras realizadas: <?php echo $vendedor['total_compras']; ?></p>
                             </div>
-                            <form action="quitar_favorito.php" method="POST">
-                                <input type="hidden" name="id_favorito" value="<?php echo $fav['id_favorito']; ?>">
-                                <button type="submit" class="corazon">❤️</button>
-                            </form>
+                            <button style="background-color: transparent; border: 1px solid #3B82F6; color: #3B82F6; border-radius: 5px; padding: 5px 10px; cursor: pointer; transition: 0.3s;" onmouseover="this.style.backgroundColor='#3B82F6'; this.style.color='white';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#3B82F6';">
+                                Ver Perfil
+                            </button>
                         </div>
                         <?php 
                             } 
                         } else {
-                            echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos en favoritos.</p>";
+                            echo "<p style='color: #94A3B8; padding: 15px;'>Aún no tienes vendedores registrados en tu historial.</p>";
                         }
                         ?>
                     </div>
-                    <button class="explorar">Ver mis favoritos</button>
+                    <button class="explorar">Ver todos los vendedores</button>
                 </section>
             </div>
 

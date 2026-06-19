@@ -62,27 +62,32 @@ $resultado_productos = mysqli_query($conexion, $query_productos);
     <link rel="stylesheet" href="CSS/css_categoria1.css?v=<?php echo time(); ?>">
 </head>
 <body>
-    <header id="navbar">
+        <header id="navbar">
         <div style="display: flex; gap: 15px;">
-            <button class="btn-nav" onclick="window.location.href='INICIO.php'">Inicio</button>
-            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.php'">Catálogo</button>
+            <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
         </div>
         
-        <div class="logo-box" onclick="window.location.href='INICIO.php'" style="cursor: pointer;">
+        <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
             <center>
                 <img src="IMAGENES/ESCOMercado.png" id="img-logo" class="img-logo" alt="Logo">
             </center>
+            <span class="logo-subtitle">ESCOMercado</span>
         </div>
         
         <div style="display: flex; gap: 15px; align-items: center;">
-            <button class="btn-nav" onclick="window.location.href='CARRITO.php'">Mi Carrito</button>
+            <button class="btn-nav" onclick="window.location.href='CARRITO.html'">Mi Carrito</button>
+            
             <?php if(isset($_SESSION['usuario_id'])) { ?>
-                <span style="color: #3B82F6; font-weight: bold;">Hola, <?php echo $_SESSION['usuario_nombre']; ?></span>
+                <span style="color: #3B82F6; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Hola, <?php echo $_SESSION['usuario_nombre']; ?>
+                </span>
+                
                 <?php if($_SESSION['usuario_rol'] == 'comprador') { ?>
-                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.php'">Mi Panel</button>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.html'">Mi Panel</button>
                 <?php } else { ?>
-                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.php'">Panel Vendedor</button>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Panel Vendedor</button>
                 <?php } ?>
+                
                 <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
             <?php } else { ?>
                 <button class="btn-nav" onclick="window.location.href='ACCESO.html'">Acceder</button>

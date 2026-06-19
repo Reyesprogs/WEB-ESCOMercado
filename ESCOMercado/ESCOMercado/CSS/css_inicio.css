@@ -432,3 +432,44 @@ a[href="#top"]:hover {
     color: #4da6ff;
     margin: 0;
 }
+
+/* =========================================
+   ADAPTACIÓN PARA LAPTOPS Y PANTALLAS PEQUEÑAS (INICIO)
+   ========================================= */
+@media screen and (max-width: 1366px) {
+    /* Hacemos las tarjetas más pequeñas para que quepan las 5 en línea */
+    .category-card {
+        width: 210px !important; 
+        height: 300px !important; 
+    }
+    
+    /* Achicamos la imagen para que no se deforme */
+    .category-card img {
+        height: 160px !important; 
+    }
+    
+    /* Reducimos el tamaño de la letra del título de la categoría */
+    .card-title {
+        font-size: 1.2rem !important; 
+    }
+    
+    /* Juntamos un poco más las tarjetas */
+    .categories-grid {
+        gap: 15px !important; 
+        padding: 20px 2% !important;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    /* Si la pantalla es AÚN más pequeña (como una tablet), las achicamos más */
+    .category-card {
+        width: 180px !important;
+        height: 260px !important;
+    }
+    .category-card img {
+        height: 130px !important;
+    }
+    .card-title {
+        font-size: 1rem !important;
+    }
+}
