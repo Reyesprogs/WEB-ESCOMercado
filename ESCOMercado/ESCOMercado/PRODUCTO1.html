@@ -1,0 +1,129 @@
+<?php session_start(); ?>
+<?php
+require 'conexion.php';
+// Recibir el ID de la URL (Ej. PRODUCTO1.html?id=4), si no existe, mostramos el 1
+$id_producto = isset($_GET['id']) ? intval($_GET['id']) : 1; 
+
+$query_prod = "SELECT p.*, u.nombres as nombre, u.apellidos, u.correo, u.ruta_foto_perfil 
+               FROM productos p JOIN usuarios u ON p.id_vendedor = u.id_usuario 
+               WHERE p.id_producto = $id_producto";
+$resultado_prod = mysqli_query($conexion, $query_prod);
+$producto = mysqli_fetch_assoc($resultado_prod);
+
+// Organizar datos del vendedor para el HTML
+$vendedor = [
+    'nombre' => $producto['nombre'],
+    'apellidos' => $producto['apellidos'],
+    'correo' => $producto['correo'],
+    'ruta_foto_perfil' => $producto['ruta_foto_perfil']
+];
+
+// Si tuvieras tabla de imágenes extra, la consulta iría aquí
+$imagenes_extra = []; 
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $producto['titulo']; ?> - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <link rel="stylesheet" href="CSS/css_producto2.css">
+</head>
+<body>
+   <header id="navbar">
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
+            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
+        </div>
+        
+        <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
+            <center>
+                <img src="IMAGENES/ESCOMercado.png" id="img-logo" class="img-logo" alt="Logo">
+            </center>
+        </div>
+        
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button class="btn-nav" onclick="window.location.href='CARRITO.html'">Mi Carrito</button>
+            
+            <?php if(isset($_SESSION['usuario_id'])) { ?>
+                <span style="color: #3B82F6; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Hola, <?php echo $_SESSION['usuario_nombre']; ?>
+                </span>
+                
+                <?php if($_SESSION['usuario_rol'] == 'comprador') { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.html'">Mi Panel</button>
+                <?php } else { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Panel Vendedor</button>
+                <?php } ?>
+                
+                <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
+            
+            <?php } else { ?>
+                <button class="btn-nav" onclick="window.location.href='ACCESO.html'">Acceder</button>
+            <?php } ?>
+        </div>
+    </header>
+    
+    <main>
+        <div class="container">
+            <h2 class="main-title"><?php echo $producto['titulo']; ?></h2>
+        </div>
+        
+        <div class="prod">
+            <video controls src="<?php echo $producto['ruta_video']; ?>"></video>
+            <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="Imagen Principal">
+            
+            <div class="prod">
+                <button class="btn-img">
+                    <img src="<?php echo $img['ruta']; ?>" alt="Imagen Extra">
+                </button>
+                </div>
+        </div>
+
+        <div class="prod2">
+            <div class="img_vendedor">
+                <h3>VENDEDOR</h3> <br>
+                <img style="text-align: center;" src="<?php echo $vendedor['ruta_foto_perfil']; ?>" alt="Foto vendedor">
+                <h4>Nombre:</h4>
+                <p><?php echo $vendedor['nombre'] . ' ' . $vendedor['apellidos']; ?></p>
+                <div class="contacto-vendedor">
+                    <h3>Contactar vendedor:</h3>
+                    <a href="mailto:<?php echo $vendedor['correo']; ?>">
+                        <img src="IMAGENES/carta.png" alt="Enviar correo" style="width: 40px; transition: 0.3s;">
+                    </a>
+                </div>
+            </div>
+            
+            <div class="descripcion">
+                <h3>Disponible: </h3> 
+                <p><?php echo $producto['stock']; ?> en Stock (Entrega en ESCOM)</p>
+                
+                <h3>Descripción / Detalles:</h3>
+                <p style="color: #E5E7EB; line-height: 1.6; margin-bottom: 20px;">
+                    <?php echo nl2br($producto['descripcion']); ?>
+                </p>
+
+                <h3>Precio:</h3> 
+                <p class="precio-destacado">$<?php echo $producto['precio']; ?> MXN</p>
+                
+                <form action="procesar_carrito.php" method="POST">
+                    <input type="hidden" name="id_producto" value="<?php echo $producto['id_producto']; ?>">
+                    <div style="margin-bottom: 15px; color: white;">
+                        <label>Cantidad a apartar:</label>
+                        <input type="number" name="cantidad" value="1" min="1" max="<?php echo $producto['stock']; ?>" style="width: 60px; padding: 5px; border-radius: 5px;">
+                    </div>
+                    <center><button type="submit" class="btn-apartar">Apartar</button></center>
+                </form>
+            </div>
+        </div>
+        
+        <div class="container2">
+            <button class="btn-nav" onclick="history.back()">REGRESAR</button>
+        </div>    
+    </main>
+</body>
+</html>

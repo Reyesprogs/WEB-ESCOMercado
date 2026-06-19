@@ -1,0 +1,135 @@
+<?php
+session_start();
+require 'conexion.php';
+
+// Si el usuario no ha iniciado sesión, lo mandamos al login
+if(!isset($_SESSION['usuario_id'])) {
+    header("Location: ACCESO.html");
+    exit();
+}
+
+// Sacamos los datos del usuario real que inició sesión
+$id_usuario = $_SESSION['usuario_id'];
+$query_usuario = "SELECT * FROM usuarios WHERE id_usuario = $id_usuario";
+$resultado_usuario = mysqli_query($conexion, $query_usuario);
+$usuario = mysqli_fetch_assoc($resultado_usuario);
+
+// Preparamos variables vacías para el historial (para que no marque error visual por ahora)
+$historial_pedidos = []; 
+$lista_favoritos = [];
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <link rel="stylesheet" href="CSS/css_cuenta_c.css">
+</head>
+<body>
+    
+    <header id="menu">
+        <button class="enlace" onclick="window.location.href='INICIO.html'">Inicio</button>
+        <div class="marca">
+            <center>
+                <img src="IMAGENES/ESCOMercado.png" class="logo" alt="Logo">
+            </center>
+        </div>
+        <button class="enlace">Contacto</button>
+    </header>
+
+    <main class="principal">
+        
+        <aside class="perfil">
+            <div class="avatar">
+                <img src="https://via.placeholder.com/150" alt="Foto" class="foto">
+            </div>
+            <h2 class="nombre"><?php echo $usuario['nombre'] . ' ' . $usuario['apellidos']; ?></h2>
+            <p class="correo"><?php echo $usuario['correo']; ?></p>
+            <span class="grado">Estudiante ESCOM - Boleta: <?php echo $usuario['boleta']; ?></span>
+            
+            <button class="volver" onclick="window.location.href='INICIO.html'">← Regresar al Inicio</button>
+        </aside>
+
+        <div class="detalles">
+            
+           <div class="bloques">
+                
+                <section class="tarjeta">
+                    <h3 class="titulo">Historial de Pedidos</h3>
+                    <div class="lista">
+                        <?php 
+                        if(isset($historial_pedidos) && mysqli_num_rows($historial_pedidos) > 0) {
+                            while($pedido = mysqli_fetch_assoc($historial_pedidos)) { 
+                        ?>
+                        <div class="renglon">
+                            <img src="<?php echo $pedido['ruta_imagen']; ?>" alt="Item" class="miniatura" style="object-fit: cover;">
+                            <div class="info">
+                                <h4><?php echo $pedido['titulo_producto']; ?></h4>
+                                <p>Fecha: <?php echo $pedido['fecha_compra']; ?> - Vendedor: <?php echo $pedido['vendedor']; ?></p>
+                            </div>
+                        </div>
+                        <?php 
+                            } 
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>Aún no tienes pedidos registrados.</p>";
+                        }
+                        ?>
+                    </div>
+                    <button class="explorar">Ver todo el historial</button>
+                </section>
+
+                <section class="tarjeta">
+                    <h3 class="titulo">Productos Guardados (Favoritos)</h3>
+                    <div class="lista">
+                        <?php 
+                        if(isset($lista_favoritos) && mysqli_num_rows($lista_favoritos) > 0) {
+                            while($fav = mysqli_fetch_assoc($lista_favoritos)) { 
+                        ?>
+                        <div class="renglon">
+                            <img src="<?php echo $fav['ruta_imagen']; ?>" alt="Item" class="miniatura" style="object-fit: cover;">
+                            <div class="info">
+                                <h4><?php echo $fav['titulo_producto']; ?></h4>
+                                <p class="costo">$<?php echo $fav['precio']; ?> MXN</p>
+                            </div>
+                            <form action="quitar_favorito.php" method="POST">
+                                <input type="hidden" name="id_favorito" value="<?php echo $fav['id_favorito']; ?>">
+                                <button type="submit" class="corazon">❤️</button>
+                            </form>
+                        </div>
+                        <?php 
+                            } 
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos en favoritos.</p>";
+                        }
+                        ?>
+                    </div>
+                    <button class="explorar">Ver mis favoritos</button>
+                </section>
+            </div>
+
+            <section class="tarjeta ayuda">
+                <h3 class="titulo">Soporte Técnico</h3>
+                <p class="explicacion">¿Tuviste algún problema con tu cuenta, una entrega o un vendedor? Déjanos un mensaje y el equipo te ayudará.</p>
+                
+                <form action="procesar_soporte.php" method="POST" class="formulario">
+                    <div class="campo">
+                        <label for="asunto">Asunto del problema</label>
+                        <input type="text" id="asunto" name="asunto_reporte" placeholder="Ej. El vendedor no se presentó..." required>
+                    </div>
+                    <div class="campo">
+                        <label for="descripcion">Descripción detallada</label>
+                        <textarea id="descripcion" name="desc_reporte" placeholder="Describe tu situación aquí..." required></textarea>
+                    </div>
+                    <button type="submit" class="mandar">Enviar Reporte</button>
+                </form>
+            </section>
+
+        </div>
+    </main>
+</body>
+</html>

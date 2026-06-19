@@ -1,0 +1,101 @@
+<?php session_start(); ?>
+<?php
+require 'conexion.php';
+$categoria_actual = "electronica"; // Puedes cambiar esto a 'computacion', 'academicos', etc.
+$nombre_categoria = "Electrónica y Componentes";
+
+$query_cat = "SELECT * FROM productos WHERE categoria = '$categoria_actual' AND estado = 'disponible'";
+$productos_categoria = mysqli_query($conexion, $query_cat);
+
+$query_vend = "SELECT DISTINCT u.username, u.boleta, u.ruta_foto_perfil as ruta_foto 
+               FROM usuarios u JOIN productos p ON u.id_usuario = p.id_vendedor 
+               WHERE p.categoria = '$categoria_actual'";
+$vendedores_categoria = mysqli_query($conexion, $query_vend);
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categoría: <?php echo $nombre_categoria; ?> - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <link rel="stylesheet" href="CSS/css_categoria1.css">
+</head>
+<body>
+   <header id="navbar">
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
+            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
+        </div>
+        
+        <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
+            <center>
+                <img src="IMAGENES/ESCOMercado.png" id="img-logo" class="img-logo" alt="Logo">
+            </center>
+        </div>
+        
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button class="btn-nav" onclick="window.location.href='CARRITO.html'">Mi Carrito</button>
+            
+            <?php if(isset($_SESSION['usuario_id'])) { ?>
+                <span style="color: #3B82F6; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Hola, <?php echo $_SESSION['usuario_nombre']; ?>
+                </span>
+                
+                <?php if($_SESSION['usuario_rol'] == 'comprador') { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.html'">Mi Panel</button>
+                <?php } else { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Panel Vendedor</button>
+                <?php } ?>
+                
+                <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
+            
+            <?php } else { ?>
+                <button class="btn-nav" onclick="window.location.href='ACCESO.html'">Acceder</button>
+            <?php } ?>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h2 class="main-title">Productos en la categoría: <?php echo $nombre_categoria; ?></h2>
+        </div>
+        
+        <section class="categories-grid">
+            
+            <div class="category-card" onclick="window.location.href='PRODUCTO1.html?id=<?php echo $prod['id_producto']; ?>'">
+                <div class="card-content">
+                    <span class="card-tag"><?php echo $prod['subcategoria']; ?></span>
+                    <h3 class="card-title"><?php echo $prod['titulo']; ?></h3>
+                    <p class="card-subtitle">$<?php echo $prod['precio']; ?> MXN</p>
+                </div>
+                <img src="<?php echo $prod['ruta_imagen']; ?>" alt="Producto">
+            </div>
+
+            </section>
+
+        <div class="container">
+            <h2 class="main-title">Vendedores destacados en esta categoría</h2>
+        </div>
+        
+        <section class="categories-grid1">
+            
+            <div class="category-card1">
+                <div class="card-content1">
+                    <span class="card-tag1">Vendedor Confiable</span>
+                    <h3 class="card-title1"><?php echo $vendedor['username']; ?></h3>
+                    <p class="card-subtitle1">Boleta: <?php echo $vendedor['boleta']; ?></p>
+                </div>
+                <img src="<?php echo $vendedor['ruta_foto']; ?>" alt="Vendedor">
+            </div>
+
+            </section>
+        
+        <div class="container2">
+            <button class="btn-nav" onclick="history.back()">REGRESAR</button>
+        </div>
+    </main>
+</body>
+</html>a

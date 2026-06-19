@@ -1,0 +1,107 @@
+<?php
+session_start();
+require 'conexion.php';
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - ESCOMercado</title>
+    <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
+    <link rel="stylesheet" href="CSS/css_producto.css">
+</head>
+<body>
+    <header id="navbar">
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
+            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
+        </div>
+        
+        <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
+            <center>
+                <img src="IMAGENES/ESCOMercado.png" id="img-logo" class="img-logo" alt="Logo">
+            </center>
+        </div>
+        
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button class="btn-nav" onclick="window.location.href='CARRITO.html'">Mi Carrito</button>
+            
+            <?php if(isset($_SESSION['usuario_id'])) { ?>
+                <span style="color: #3B82F6; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Hola, <?php echo $_SESSION['usuario_nombre']; ?>
+                </span>
+                
+                <?php if($_SESSION['usuario_rol'] == 'comprador') { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.html'">Mi Panel</button>
+                <?php } else { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Panel Vendedor</button>
+                <?php } ?>
+                
+                <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
+            <?php } else { ?>
+                <button class="btn-nav" onclick="window.location.href='ACCESO.html'">Acceder</button>
+            <?php } ?>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2 class="main-title">Catálogo Global de Productos</h2>
+        </div>
+        <div class="seccion-navegacion">
+            <button onclick="moverIzquierda()" class="flecha"> ❮ </button>
+            
+            <div class="visor-botones" id="visor">
+                <div id="contenedor-dinamico" class="fila-larga">
+                    
+                    <?php 
+                    $query_todos = "SELECT * FROM productos WHERE estado = 'disponible' ORDER BY fecha_publicacion DESC";
+                    $resultado_todos = mysqli_query($conexion, $query_todos);
+                    
+                    if(mysqli_num_rows($resultado_todos) > 0) {
+                        while($producto = mysqli_fetch_assoc($resultado_todos)) { 
+                    ?>
+
+                    <button class="boton-item" onclick="window.location.href='PRODUCTO1.html?id=<?php echo $producto['id_producto']; ?>'" style="background: none; border: none; padding: 0; cursor: pointer; text-align: left;">
+                        <div class="category-card">
+                            <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="<?php echo $producto['titulo']; ?>">
+                            <div class="card-content">
+                                <div>
+                                    <span class="card-tag"><?php echo $producto['categoria']; ?></span>
+                                    <h3 class="card-title"><?php echo $producto['titulo']; ?></h3>
+                                </div>
+                                <p class="card-subtitle" style="font-weight: bold; font-size: 18px; margin-top: 10px;">$<?php echo $producto['precio']; ?> MXN</p>
+                            </div>
+                        </div>
+                    </button>
+
+                    <?php 
+                        } 
+                    } else {
+                        echo "<p style='color: white; margin: 20px; font-family: sans-serif;'>No hay productos disponibles en este momento.</p>";
+                    }
+                    ?>
+
+                </div>
+            </div>
+            
+            <button onclick="moverDerecha()" class="flecha"> ❯ </button>
+        </div>
+    </main>
+    <script>
+        const visor = document.getElementById('visor');
+
+        function moverDerecha() {
+            visor.scrollLeft += visor.offsetWidth;
+        }
+
+        function moverIzquierda() {
+            visor.scrollLeft -= visor.offsetWidth;
+        }
+    </script>
+</body>
+</html>
