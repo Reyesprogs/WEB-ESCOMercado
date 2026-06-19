@@ -1,3 +1,23 @@
+<?php
+session_start();
+require 'conexion.php';
+
+// Si el usuario no ha iniciado sesión, lo mandamos al login
+if(!isset($_SESSION['usuario_id'])) {
+    header("Location: ACCESO.html");
+    exit();
+}
+
+// Sacamos los datos del usuario real que inició sesión
+$id_usuario = $_SESSION['usuario_id'];
+$query_usuario = "SELECT * FROM usuarios WHERE id_usuario = $id_usuario";
+$resultado_usuario = mysqli_query($conexion, $query_usuario);
+$usuario = mysqli_fetch_assoc($resultado_usuario);
+
+// Preparamos variables vacías para el historial (para que no marque error visual por ahora)
+$historial_pedidos = []; 
+$lista_favoritos = [];
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -37,30 +57,41 @@
 
         <div class="detalles">
             
-            <div class="bloques">
+           <div class="bloques">
                 
                 <section class="tarjeta">
                     <h3 class="titulo">Historial de Pedidos</h3>
                     <div class="lista">
-                        
+                        <?php 
+                        if(isset($historial_pedidos) && mysqli_num_rows($historial_pedidos) > 0) {
+                            while($pedido = mysqli_fetch_assoc($historial_pedidos)) { 
+                        ?>
                         <div class="renglon">
-                            <img src="<?php echo $pedido['ruta_imagen']; ?>" alt="Item" class="miniatura">
+                            <img src="<?php echo $pedido['ruta_imagen']; ?>" alt="Item" class="miniatura" style="object-fit: cover;">
                             <div class="info">
                                 <h4><?php echo $pedido['titulo_producto']; ?></h4>
                                 <p>Fecha: <?php echo $pedido['fecha_compra']; ?> - Vendedor: <?php echo $pedido['vendedor']; ?></p>
                             </div>
                         </div>
-
-                        </div>
+                        <?php 
+                            } 
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>Aún no tienes pedidos registrados.</p>";
+                        }
+                        ?>
+                    </div>
                     <button class="explorar">Ver todo el historial</button>
                 </section>
 
                 <section class="tarjeta">
                     <h3 class="titulo">Productos Guardados (Favoritos)</h3>
                     <div class="lista">
-                        
+                        <?php 
+                        if(isset($lista_favoritos) && mysqli_num_rows($lista_favoritos) > 0) {
+                            while($fav = mysqli_fetch_assoc($lista_favoritos)) { 
+                        ?>
                         <div class="renglon">
-                            <img src="<?php echo $fav['ruta_imagen']; ?>" alt="Item" class="miniatura">
+                            <img src="<?php echo $fav['ruta_imagen']; ?>" alt="Item" class="miniatura" style="object-fit: cover;">
                             <div class="info">
                                 <h4><?php echo $fav['titulo_producto']; ?></h4>
                                 <p class="costo">$<?php echo $fav['precio']; ?> MXN</p>
@@ -70,8 +101,13 @@
                                 <button type="submit" class="corazon">❤️</button>
                             </form>
                         </div>
-
-                        </div>
+                        <?php 
+                            } 
+                        } else {
+                            echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos en favoritos.</p>";
+                        }
+                        ?>
+                    </div>
                     <button class="explorar">Ver mis favoritos</button>
                 </section>
             </div>

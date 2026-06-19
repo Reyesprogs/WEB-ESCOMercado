@@ -1,3 +1,26 @@
+<?php session_start(); ?>
+<?php
+require 'conexion.php';
+// Recibir el ID de la URL (Ej. PRODUCTO1.html?id=4), si no existe, mostramos el 1
+$id_producto = isset($_GET['id']) ? intval($_GET['id']) : 1; 
+
+$query_prod = "SELECT p.*, u.nombres as nombre, u.apellidos, u.correo, u.ruta_foto_perfil 
+               FROM productos p JOIN usuarios u ON p.id_vendedor = u.id_usuario 
+               WHERE p.id_producto = $id_producto";
+$resultado_prod = mysqli_query($conexion, $query_prod);
+$producto = mysqli_fetch_assoc($resultado_prod);
+
+// Organizar datos del vendedor para el HTML
+$vendedor = [
+    'nombre' => $producto['nombre'],
+    'apellidos' => $producto['apellidos'],
+    'correo' => $producto['correo'],
+    'ruta_foto_perfil' => $producto['ruta_foto_perfil']
+];
+
+// Si tuvieras tabla de imágenes extra, la consulta iría aquí
+$imagenes_extra = []; 
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,14 +34,38 @@
     <link rel="stylesheet" href="CSS/css_producto2.css">
 </head>
 <body>
-    <header id="navbar">
-        <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
-        <div class="logo-box">
+   <header id="navbar">
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
+            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
+        </div>
+        
+        <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
             <center>
-                <img src="IMAGENES/ESCOMercado.png" class="img-logo" alt="Logo">
+                <img src="IMAGENES/ESCOMercado.png" id="img-logo" class="img-logo" alt="Logo">
             </center>
         </div>
-        <button class="btn-nav">Contacto</button>
+        
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button class="btn-nav" onclick="window.location.href='CARRITO.html'">Mi Carrito</button>
+            
+            <?php if(isset($_SESSION['usuario_id'])) { ?>
+                <span style="color: #3B82F6; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Hola, <?php echo $_SESSION['usuario_nombre']; ?>
+                </span>
+                
+                <?php if($_SESSION['usuario_rol'] == 'comprador') { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.html'">Mi Panel</button>
+                <?php } else { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Panel Vendedor</button>
+                <?php } ?>
+                
+                <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
+            
+            <?php } else { ?>
+                <button class="btn-nav" onclick="window.location.href='ACCESO.html'">Acceder</button>
+            <?php } ?>
+        </div>
     </header>
     
     <main>

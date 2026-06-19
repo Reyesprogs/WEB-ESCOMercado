@@ -1,3 +1,37 @@
+<?php
+session_start();
+require 'conexion.php';
+
+if(!isset($_SESSION['usuario_id'])) {
+    echo "<script>alert('Debes iniciar sesión para ver tu carrito'); window.location.href='ACCESO.html';</script>";
+    exit();
+}
+
+$id_comprador_actual = $_SESSION['usuario_id']; // Ahora sí, usa el ID del usuario conectado
+
+$query_carrito = "SELECT c.id_carrito, c.cantidad, p.titulo as titulo_producto, p.precio, 
+                  p.ruta_imagen_principal as ruta_imagen, u.nombres as nombre_vendedor 
+                  FROM carrito_compras c 
+                  JOIN productos p ON c.id_producto = p.id_producto 
+                  JOIN usuarios u ON p.id_vendedor = u.id_usuario 
+                  WHERE c.id_comprador = $id_comprador_actual";
+$carrito_resultado = mysqli_query($conexion, $query_carrito);
+
+$subtotal = 0;
+$total_articulos = 0;
+$hay_productos = mysqli_num_rows($carrito_resultado) > 0;
+
+if ($hay_productos) {
+    while($item = mysqli_fetch_assoc($carrito_resultado)) {
+        $subtotal += ($item['precio'] * $item['cantidad']);
+        $total_articulos += $item['cantidad'];
+    }
+    $total_pagar = $subtotal;
+    mysqli_data_seek($carrito_resultado, 0); // Reinicia para poder leerlos abajo
+} else {
+    $total_pagar = 0;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,13 +46,37 @@
 </head>
 <body>
     <header id="navbar">
-        <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
-        <div class="logo-box">
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
+            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
+        </div>
+        
+        <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
             <center>
-                <img src="IMAGENES/ESCOMercado.png" class="img-logo" alt="Logo">
+                <img src="IMAGENES/ESCOMercado.png" id="img-logo" class="img-logo" alt="Logo">
             </center>
         </div>
-        <button class="btn-nav">Contacto</button>
+        
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button class="btn-nav" onclick="window.location.href='CARRITO.html'">Mi Carrito</button>
+            
+            <?php if(isset($_SESSION['usuario_id'])) { ?>
+                <span style="color: #3B82F6; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Hola, <?php echo $_SESSION['usuario_nombre']; ?>
+                </span>
+                
+                <?php if($_SESSION['usuario_rol'] == 'comprador') { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.html'">Mi Panel</button>
+                <?php } else { ?>
+                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Panel Vendedor</button>
+                <?php } ?>
+                
+                <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
+            
+            <?php } else { ?>
+                <button class="btn-nav" onclick="window.location.href='ACCESO.html'">Acceder</button>
+            <?php } ?>
+        </div>
     </header>
 
     <main>
@@ -28,33 +86,31 @@
 
         <div class="cart-wrapper">
             <section class="cart-2">
-                
+                <?php if(!$hay_productos) { ?>
+                    <h3 style="color: #E5E7EB; text-align: center; margin-top: 50px;">Tu carrito está vacío.</h3>
+                <?php } else { 
+                    while($item = mysqli_fetch_assoc($carrito_resultado)) { 
+                ?>
+
                 <div class="cart">
                     <img src="<?php echo $item['ruta_imagen']; ?>" alt="Producto" class="item-img">
                     <div class="item-info">
                         <h3 class="item-title"><?php echo $item['titulo_producto']; ?></h3>
                         <p class="item-v">Vendedor: <?php echo $item['nombre_vendedor']; ?></p>
                     </div>
-                    
                     <div class="item-cu">
-                        <form action="actualizar_cantidad.php" method="POST" style="display:inline;">
-                            <input type="hidden" name="id_item_carrito" value="<?php echo $item['id_carrito']; ?>">
-                            <label>Cant.</label>
-                            <input type="number" name="cantidad" value="<?php echo $item['cantidad']; ?>" min="1" class="qty-input" onchange="this.form.submit()">
-                        </form>
+                        <p style="color: white; font-size: 14px;">Cant: <?php echo $item['cantidad']; ?></p>
                     </div>
-
                     <div class="item-pricing">
                         <p class="price">$<?php echo $item['precio']; ?> MXN</p>
-                        
-                        <form action="eliminar_del_carrito.php" method="POST" style="margin-top: 5px;">
-                            <input type="hidden" name="id_eliminar" value="<?php echo $item['id_carrito']; ?>">
-                            <button type="submit" class="btn-remove">Eliminar</button>
-                        </form>
                     </div>
                 </div>
 
-                </section>
+                <?php 
+                    } // Cierra el while
+                } // Cierra el else
+                ?>
+            </section>
 
             <aside class="cart-2">
                 <h3 class="title-1">Resumen de Compra</h3>

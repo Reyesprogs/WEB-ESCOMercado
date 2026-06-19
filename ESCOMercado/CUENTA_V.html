@@ -1,4 +1,16 @@
-<!DOCTYPE html>
+<?php session_start(); ?>
+<?php
+require 'conexion.php';
+$categoria_actual = "electronica"; // Puedes cambiar esto a 'computacion', 'academicos', etc.
+$nombre_categoria = "Electrónica y Componentes";
+
+$query_cat = "SELECT * FROM productos WHERE categoria = '$categoria_actual' AND estado = 'disponible'";
+$productos_categoria = mysqli_query($conexion, $query_cat);
+
+$query_vend = "SELECT DISTINCT u.username, u.boleta, u.ruta_foto_perfil as ruta_foto 
+               FROM usuarios u JOIN productos p ON u.id_usuario = p.id_vendedor 
+               WHERE p.categoria = '$categoria_actual'";
+$vendedore<!DOCTYPE html>
 <html lang="es">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
