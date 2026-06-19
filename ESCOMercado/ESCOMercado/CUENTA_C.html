@@ -15,8 +15,9 @@ $resultado_usuario = mysqli_query($conexion, $query_usuario);
 $usuario = mysqli_fetch_assoc($resultado_usuario);
 
 // Preparamos variables vacías para el historial (para que no marque error visual por ahora)
-$historial_pedidos = []; 
-$lista_favoritos = [];
+// Preparamos variables vacías para el historial
+$historial_pedidos = null; 
+$lista_favoritos = null;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,14 +46,52 @@ $lista_favoritos = [];
     <main class="principal">
         
         <aside class="perfil">
-            <div class="avatar">
-                <img src="https://via.placeholder.com/150" alt="Foto" class="foto">
+            <div class="avatar" style="text-align: center;">
+                <img src="<?php echo $usuario['ruta_foto_perfil']; ?>" alt="Foto de perfil" class="foto" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #3B82F6;">
+                
+                <form action="actualizar_perfil.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="accion" value="foto">
+                    <label for="nuevaFoto" class="cambiar" style="cursor: pointer; color: #3B82F6; font-size: 13px; font-weight: bold; display: block; margin-top: 10px;">Cambiar foto</label>
+                    <input type="file" name="foto_perfil" id="nuevaFoto" accept="image/*" style="display: none;" onchange="this.form.submit()">
+                </form>
             </div>
-            <h2 class="nombre"><?php echo $usuario['nombre'] . ' ' . $usuario['apellidos']; ?></h2>
-            <p class="correo"><?php echo $usuario['correo']; ?></p>
-            <span class="grado">Estudiante ESCOM - Boleta: <?php echo $usuario['boleta']; ?></span>
             
-            <button class="volver" onclick="window.location.href='INICIO.html'">← Regresar al Inicio</button>
+            <h2 class="nombre" style="text-align: center; margin-top: 15px;"><?php echo $usuario['nombres'] . ' ' . $usuario['apellidos']; ?></h2>
+            <p class="correo" style="text-align: center;"><?php echo $usuario['correo']; ?></p>
+            <span class="grado" style="display: block; text-align: center; margin-bottom: 25px;">Boleta: <?php echo $usuario['boleta']; ?></span>
+            
+            <div style="background-color: #1E293B; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #334155;">
+                <h3 style="font-size: 14px; margin-top: 0; margin-bottom: 15px; color: #E5E7EB; border-bottom: 1px solid #475569; padding-bottom: 8px;">Editar Información</h3>
+                
+                <form action="actualizar_perfil.php" method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="hidden" name="accion" value="datos">
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: #94A3B8; display: block; margin-bottom: 4px;">Nombre(s)</label>
+                            <input type="text" name="nombres" value="<?php echo $usuario['nombres']; ?>" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #475569; background: #0F172A; color: white; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: #94A3B8; display: block; margin-bottom: 4px;">Apellidos</label>
+                            <input type="text" name="apellidos" value="<?php echo $usuario['apellidos']; ?>" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #475569; background: #0F172A; color: white; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="font-size: 11px; color: #94A3B8; display: block; margin-bottom: 4px;">Correo Electrónico</label>
+                        <input type="email" name="correo" value="<?php echo $usuario['correo']; ?>" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #475569; background: #0F172A; color: white; box-sizing: border-box;">
+                    </div>
+
+                    <div>
+                        <label style="font-size: 11px; color: #94A3B8; display: block; margin-bottom: 4px;">Nueva Contraseña</label>
+                        <input type="password" name="password" placeholder="Dejar en blanco para no cambiarla" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #475569; background: #0F172A; color: white; box-sizing: border-box;">
+                    </div>
+
+                    <button type="submit" style="background-color: #3B82F6; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.3s;">Actualizar Datos</button>
+                </form>
+            </div>
+            
+            <button class="volver" onclick="window.location.href='INICIO.php'">← Regresar al Inicio</button>
         </aside>
 
         <div class="detalles">

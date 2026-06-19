@@ -81,63 +81,65 @@ body {
     cursor: pointer;
     transition: 0.3s;
 }
-/* ////////////////////////////////////////////////////////////////////////////////*/
 
-/* Contenedor que permite que las flechas y el visor estén en la misma línea */
+/* =========================================
+   CONFIGURACIÓN DEL SLIDER CATÁLOGO (4 Columnas x 2 Filas)
+   ========================================= */
 .seccion-navegacion {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     width: 100%;
+    margin-top: 20px;
 }
 
 .visor-botones {
-    width: 1400px; /* Ancho para 4 tarjetas */
-    height: 900px; /* Alto suficiente para 6 filas */
-    overflow: hidden; /* Oculta lo que desborda */
-    scroll-behavior: smooth;
+    width: 100%;
+    max-width: 1200px; /* Se amplía bastante para que quepan 4 tarjetas holgadamente */
+    overflow-x: hidden; 
+    scroll-behavior: smooth; 
 }
 
 .fila-larga {
     display: grid;
-    /* 1. Define 6 filas fijas */
-    grid-template-rows: repeat(6, 1fr); 
-    /* 2. IMPORTANTE: Obliga a que los botones nuevos se pongan en columnas a la derecha */
+    /* Obliga a crear exactamente 2 filas verticales */
+    grid-template-rows: repeat(2, 380px); 
     grid-auto-flow: column; 
-    /* 3. Define que cada columna ocupe el 25% (para que se vean 4) */
+    /* Divide el ancho para que quepan exactamente 4 tarjetas a la vez */
     grid-auto-columns: calc(25% - 15px); 
-    gap: 15px;
-    height: 100%; /* El contenedor debe tener altura para que las 6 filas existan */
+    gap: 20px;
+    padding: 10px;
 }
 
-/* Limpieza del botón item */
 .boton-item {
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
+    text-align: left;
     width: 100%;
+    height: 100%;
 }
 
 .category-card {
-    background-color: #a3d0ff;
-    border-radius: 20px;
-    height: 120px; /* Ajustado para que quepan 6 filas en el visor */
-    padding: 10px;
-    display: flex;
-    flex-direction: row; /* Imagen a un lado, texto al otro */
-    align-items: center;
-    gap: 10px;
-    transition: transform 0.3s ease;
+    width: 100%;
+    height: 100%; 
+    box-sizing: border-box;
+    background-color: #1E293B; 
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
 }
 
 .category-card img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 12px;
+    width: 100%;
+    height: 200px;
+    object-fit: cover; 
+    border-bottom: 2px solid #334155;
 }
 
 /* =========================================

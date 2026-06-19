@@ -23,7 +23,6 @@ $resultado_destacados = mysqli_query($conexion, $query_destacados);
     <header id="navbar">
         <div style="display: flex; gap: 15px;">
             <button class="btn-nav" onclick="window.location.href='INICIO.html'">Inicio</button>
-            <button class="btn-nav" onclick="window.location.href='PRODUCTOS.html'">Catálogo</button>
         </div>
         
         <div class="logo-box" onclick="window.location.href='INICIO.html'" style="cursor: pointer;">
@@ -63,36 +62,45 @@ $resultado_destacados = mysqli_query($conexion, $query_destacados);
 
     <main>
         <div class="container" >
-            <h2 class="main-title">Productos Destacados</h2>
+            <h2 class="main-title">Categorias Principales</h2>
         </div>
         
-        <section class="categories-grid">
+        <section class="categories-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 35px; margin-bottom: 50px;">
             
-            <?php 
-            if (isset($resultado_destacados) && mysqli_num_rows($resultado_destacados) > 0) {
-                while($producto = mysqli_fetch_assoc($resultado_destacados)) { 
-            ?>
-            
-            <div class="category-card" onclick="window.location.href='PRODUCTO1.html?id=<?php echo $producto['id_producto']; ?>'" style="cursor: pointer;">
-                <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="<?php echo $producto['titulo']; ?>">
-                
-                <div class="card-content">
-                    <div>
-                        <span class="card-tag"><?php echo $producto['categoria']; ?></span>
-                        <h3 class="card-title"><?php echo $producto['titulo']; ?></h3>
-                    </div>
-                    <p class="card-subtitle" style="font-weight: bold; font-size: 18px; margin-top: 10px;">$<?php echo $producto['precio']; ?> MXN</p>
+            <div class="category-card" onclick="window.location.href='CATEGORIAS1.html?cat=electronica'" style="cursor: pointer;">
+                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Electrónica y Componentes">
+                <div class="card-content" style="align-items: center; justify-content: center;">
+                    <h3 class="card-title" style="font-size: 24px; text-align: center; margin: 0;">Electrónica</h3>
                 </div>
             </div>
 
-            <?php 
-                } 
-            } else {
-                echo "<div style='grid-column: 1 / -1; text-align: center; padding: 40px;'>
-                        <h3 style='color: #E5E7EB;'>Aún no hay productos publicados en el mercado.</h3>
-                      </div>";
-            }
-            ?>
+            <div class="category-card" onclick="window.location.href='CATEGORIAS1.html?cat=digital'" style="cursor: pointer;">
+                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Servicios Digitales">
+                <div class="card-content" style="align-items: center; justify-content: center;">
+                    <h3 class="card-title" style="font-size: 24px; text-align: center; margin: 0;">Digital</h3>
+                </div>
+            </div>
+
+            <div class="category-card" onclick="window.location.href='CATEGORIAS1.html?cat=alimentos'" style="cursor: pointer;">
+                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Comida y Snacks">
+                <div class="card-content" style="align-items: center; justify-content: center;">
+                    <h3 class="card-title" style="font-size: 24px; text-align: center; margin: 0;">Alimentos</h3>
+                </div>
+            </div>
+
+            <div class="category-card" onclick="window.location.href='CATEGORIAS1.html?cat=accesorios'" style="cursor: pointer;">
+                <img src="https://images.unsplash.com/photo-1523206489230-c012c64b2b48?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Accesorios Escolares">
+                <div class="card-content" style="align-items: center; justify-content: center;">
+                    <h3 class="card-title" style="font-size: 24px; text-align: center; margin: 0;">Accesorios</h3>
+                </div>
+            </div>
+
+            <div class="category-card" onclick="window.location.href='CATEGORIAS1.html?cat=ropa'" style="cursor: pointer;">
+                <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Ropa y Uniformes">
+                <div class="card-content" style="align-items: center; justify-content: center;">
+                    <h3 class="card-title" style="font-size: 24px; text-align: center; margin: 0;">Ropa</h3>
+                </div>
+            </div>
 
         </section>
         

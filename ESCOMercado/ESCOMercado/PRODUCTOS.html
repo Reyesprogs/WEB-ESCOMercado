@@ -59,6 +59,7 @@ require 'conexion.php';
                 <div id="contenedor-dinamico" class="fila-larga">
                     
                     <?php 
+                    // Solicitamos los productos a la Base de Datos
                     $query_todos = "SELECT * FROM productos WHERE estado = 'disponible' ORDER BY fecha_publicacion DESC";
                     $resultado_todos = mysqli_query($conexion, $query_todos);
                     
@@ -66,9 +67,9 @@ require 'conexion.php';
                         while($producto = mysqli_fetch_assoc($resultado_todos)) { 
                     ?>
 
-                    <button class="boton-item" onclick="window.location.href='PRODUCTO1.html?id=<?php echo $producto['id_producto']; ?>'" style="background: none; border: none; padding: 0; cursor: pointer; text-align: left;">
+                    <button class="boton-item" onclick="window.location.href='PRODUCTO1.php?id=<?php echo $producto['id_producto']; ?>'">
                         <div class="category-card">
-                            <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="<?php echo $producto['titulo']; ?>">
+                            <img src="<?php echo $producto['ruta_imagen_principal']; ?>" alt="Producto">
                             <div class="card-content">
                                 <div>
                                     <span class="card-tag"><?php echo $producto['categoria']; ?></span>
@@ -82,7 +83,7 @@ require 'conexion.php';
                     <?php 
                         } 
                     } else {
-                        echo "<p style='color: white; margin: 20px; font-family: sans-serif;'>No hay productos disponibles en este momento.</p>";
+                        echo "<p style='color: white; padding: 20px; font-family: sans-serif;'>No hay productos disponibles.</p>";
                     }
                     ?>
 
@@ -91,17 +92,18 @@ require 'conexion.php';
             
             <button onclick="moverDerecha()" class="flecha"> ❯ </button>
         </div>
-    </main>
-    <script>
-        const visor = document.getElementById('visor');
 
-        function moverDerecha() {
-            visor.scrollLeft += visor.offsetWidth;
-        }
+        <script>
+            const visor = document.getElementById('visor');
 
-        function moverIzquierda() {
-            visor.scrollLeft -= visor.offsetWidth;
-        }
-    </script>
+            function moverDerecha() {
+                // Al dar clic, desliza exactamente el ancho del visor (2 columnas)
+                visor.scrollLeft += visor.offsetWidth; 
+            }
+
+            function moverIzquierda() {
+                visor.scrollLeft -= visor.offsetWidth;
+            }
+        </script>
 </body>
 </html>
