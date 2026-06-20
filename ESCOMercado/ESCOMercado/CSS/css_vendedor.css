@@ -5,9 +5,9 @@
     width: 100%;
     padding: 10px 12px;
     border-radius: 6px;
-    border: 1px solid #475569; /* Gris oscuro para el borde inicial */
-    background-color: #0F172A; /* Azul Medianoche */
-    color: #E5E7EB; /* Gris Platino para el texto */
+    border: 1px solid #475569;
+    background-color: #0F172A; 
+    color: #E5E7EB; 
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 14px;
     height: 44px;
@@ -16,13 +16,11 @@
     transition: border-color 0.3s ease;
 }
 
-/* Efecto al hacer clic en el select */
 .campo select:focus {
     outline: none;
-    border-color: #3B82F6; /* Azul Cobalto Vibrante */
+    border-color: #3B82F6; 
 }
 
-/* Estilo de las opciones desplegadas */
 .campo select option {
     background-color: #0F172A;
     color: #E5E7EB;
@@ -76,28 +74,27 @@ body {
     transform: scale(1.05);
 }
 
-/* --- Contenedor Principal --- */
+/* --- Contenedor Principal (Escala corregida) --- */
 .principal {
     margin-top: 110px;
-    max-width: 1300px; /* Aumentamos un poquito el ancho total para no robarle espacio al lado derecho */
+    max-width: 1250px; 
     margin-left: auto;
     margin-right: auto;
     padding: 0 5%;
     display: flex;
-    justify-content: center; /* Esto fuerza a que ambos bloques estén centrados perfectamente */
-    gap: 30px;
+    justify-content: center;
+    gap: 30px; 
     align-items: flex-start;
     margin-bottom: 60px;
 }
 
-/* --- Perfil Lateral --- */
+/* --- Perfil Lateral (Fijado a un ancho que no aplaste lo demás) --- */
 .perfil {
-    flex: 1;
-    min-width: 350px; /* Le ponemos un ancho mínimo para evitar que se haga flaquito */
+    flex: 0 0 320px; 
     background-color: #1E293B;
     border: 1px solid #303b53;
     border-radius: 28px;
-    padding: 40px 40px; /* <-- Aumentamos el padding lateral de 20px a 40px para darle más espacio/aire */
+    padding: 30px; 
     text-align: center;
     position: sticky;
     top: 110px;
@@ -253,26 +250,32 @@ body {
     color: white;
 }
 
-/* --- Panel Central --- */
+/* --- Panel Central (Todo el espacio libre) --- */
 .detalles {
-    flex: 2.5;
+    flex: 1; 
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
+    min-width: 0; 
 }
 
-.bloques {
-    display: flex;
-    gap: 30px;
-}
-
+/* --- Tarjeta Individual (Para que tome 100% por defecto) --- */
 .tarjeta {
-    flex: 1;
     background-color: #1E293B;
     border: 1px solid #303b53;
     border-radius: 28px;
     padding: 30px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* --- Bloques Flexibles (Solo para columnas lado a lado) --- */
+.bloques {
+    display: flex;
+    gap: 20px;
+}
+
+.bloques .tarjeta {
+    flex: 1;
 }
 
 .titulo {
@@ -285,7 +288,7 @@ body {
 }
 
 /* --- Listados (Catálogo) --- */
-.catalogo {
+.catalogo, .lista {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -333,12 +336,6 @@ body {
     font-size: 0.9rem;
 }
 
-.comprador {
-    color: #f1c40f;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
 .quitar {
     background: none;
     border: none;
@@ -357,7 +354,7 @@ body {
     cursor: pointer;
 }
 
-/* --- Formularios (Subir y Ayuda) --- */
+/* --- Formularios --- */
 .explicacion {
     margin-bottom: 20px;
     color: #86868b;
@@ -383,6 +380,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0; /* CRÍTICO: Evita que los inputs empujen la tarjeta hacia afuera */
 }
 
 .campo label {
@@ -418,6 +416,9 @@ body {
     border: 2px dashed #303b53 !important;
     background-color: transparent !important;
     cursor: pointer;
+    width: 100%; /* Obliga al botón a tomar justo el espacio que tiene, ni más ni menos */
+    box-sizing: border-box;
+    overflow: hidden; /* Por si el nombre del archivo es muy largo, no rompa el diseño */
 }
 
 .mandar {
@@ -448,6 +449,7 @@ body {
         position: relative;
         top: 0;
         width: 100%;
+        flex: auto;
     }
     .bloques {
         flex-direction: column;

@@ -16,19 +16,34 @@ $resultado_usuario = mysqli_query($conexion, $query_usuario);
 $usuario = mysqli_fetch_assoc($resultado_usuario);
 
 // 2. VENTAS: Obtener los productos que este vendedor tiene activos
-$q_mis_productos = "SELECT * FROM productos WHERE id_vendedor = $id_usuario AND estado != 'vendido' AND estado != 'eliminado'";
+$q_mis_productos = "SELECT * FROM productos WHERE id_vendedor = $id_usuario AND estado NOT IN ('vendido', 'eliminado')";
 $mis_productos = mysqli_query($conexion, $q_mis_productos);
 
-// 3. VENTAS: Obtener pedidos apartados (pendientes de confirmación/entrega)
-$q_apartados = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_principal as ruta_imagen, 
-                       u.username as comprador_user, u.nombres as comp_nombres 
+// 3. VENTAS: EN ESPERA (Pendientes)
+$q_espera = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_principal as ruta_imagen, u.nombres as comp_nombres 
+             FROM pedidos p
+             JOIN productos pr ON p.id_producto = pr.id_producto
+             JOIN usuarios u ON p.id_comprador = u.id_usuario
+             WHERE pr.id_vendedor = $id_usuario AND p.estado_entrega = 'pendiente'";
+$pedidos_espera = mysqli_query($conexion, $q_espera);
+
+// 4. VENTAS: REGRESADOS (Cancelados)
+$q_regresados = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_principal as ruta_imagen, u.nombres as comp_nombres 
+                 FROM pedidos p
+                 JOIN productos pr ON p.id_producto = pr.id_producto
+                 JOIN usuarios u ON p.id_comprador = u.id_usuario
+                 WHERE pr.id_vendedor = $id_usuario AND p.estado_entrega = 'cancelado'";
+$pedidos_regresados = mysqli_query($conexion, $q_regresados);
+
+// 5. VENTAS: ACEPTADOS (Entregados)
+$q_aceptados = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_principal as ruta_imagen, u.nombres as comp_nombres 
                 FROM pedidos p
                 JOIN productos pr ON p.id_producto = pr.id_producto
                 JOIN usuarios u ON p.id_comprador = u.id_usuario
-                WHERE pr.id_vendedor = $id_usuario AND p.estado_entrega = 'pendiente'";
-$pedidos_apartados = mysqli_query($conexion, $q_apartados);
+                WHERE pr.id_vendedor = $id_usuario AND p.estado_entrega = 'entregado'";
+$pedidos_aceptados = mysqli_query($conexion, $q_aceptados);
 
-// 4. COMPRAS: Historial de compras (pedidos propios del usuario)
+// --- CONSULTAS DE MODO COMPRADOR ---
 $q_pedidos_propios = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_principal as ruta_imagen, u.username as vendedor 
                       FROM pedidos p 
                       JOIN productos pr ON p.id_producto = pr.id_producto 
@@ -36,14 +51,12 @@ $q_pedidos_propios = "SELECT p.*, pr.titulo as titulo_producto, pr.ruta_imagen_p
                       WHERE p.id_comprador = $id_usuario";
 $historial_pedidos = mysqli_query($conexion, $q_pedidos_propios);
 
-// 5. COMPRAS: Mis Favoritos
 $q_favs = "SELECT f.*, pr.titulo as titulo_producto, pr.precio, pr.ruta_imagen_principal as ruta_imagen 
            FROM favoritos f 
            JOIN productos pr ON f.id_producto = pr.id_producto 
            WHERE f.id_comprador = $id_usuario";
 $lista_favoritos = mysqli_query($conexion, $q_favs);
 
-// 6. COMPRAS: Historial de Vendedores (A los que les he comprado)
 $q_mis_vendedores = "SELECT DISTINCT u.id_usuario, u.username, u.ruta_foto_perfil, u.correo 
                      FROM pedidos p 
                      JOIN productos pr ON p.id_producto = pr.id_producto 
@@ -59,7 +72,7 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Vendedor - ESCOMercado</title>
+    <title>Panel Principal - ESCOMercado</title>
     <link rel="icon" type="image/png" href="IMAGENES/ESCOMercado.png">
     <link rel="stylesheet" href="CSS/css_vendedor.css">
     <style>
@@ -88,15 +101,17 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
     <main class="principal">
         
         <aside class="perfil">
-            <div class="avatar">
-                <img src="<?php echo !empty($usuario['ruta_foto_perfil']) ? htmlspecialchars($usuario['ruta_foto_perfil']) : 'IMAGENES/logosf.png'; ?>" alt="Foto" class="foto">
-                <label for="nuevaFoto" class="cambiar">Cambiar foto</label>
-                <input type="file" id="nuevaFoto" class="oculto" accept="image/*">
-            </div>
+            <form action="actualizar_foto.php" method="POST" enctype="multipart/form-data">
+                <div class="avatar">
+                    <img src="<?php echo !empty($usuario['ruta_foto_perfil']) ? htmlspecialchars($usuario['ruta_foto_perfil']) : 'IMAGENES/logosf.png'; ?>" alt="Foto" class="foto">
+                    <label for="nuevaFoto" class="cambiar" style="cursor: pointer;">Cambiar foto</label>
+                    <input type="file" id="nuevaFoto" name="foto_perfil" class="oculto" accept="image/*" onchange="this.form.submit()" style="display: none;">
+                </div>
+            </form>
             
             <h2 class="nombre"><?php echo htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']); ?></h2>
             <p class="correo"><?php echo htmlspecialchars($usuario['correo']); ?></p>
-            <span class="grado">Vendedor ESCOM - Boleta: <?php echo htmlspecialchars($usuario['boleta']); ?></span>
+            <span class="grado">Boleta: <?php echo htmlspecialchars($usuario['boleta']); ?></span>
             
             <div class="biografia" style="margin-top: 20px; text-align: left;">
                 <h3 class="subtitulo" style="text-align: center;">Editar Perfil</h3>
@@ -110,6 +125,17 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
                     <label style="color: #9CA3AF; font-size: 13px;">WhatsApp (Contacto):</label>
                     <input type="tel" name="telefono" class="celular" value="<?php echo htmlspecialchars($usuario['telefono'] ?? ''); ?>" required>
                     
+                    <label style="color: #9CA3AF; font-size: 13px;">CLABE Bancaria:</label>
+                    <input type="text" name="clabe" class="celular" pattern="[0-9]{18}" title="Debe contener exactamente 18 dígitos" placeholder="18 dígitos" value="<?php echo htmlspecialchars($usuario['clabe'] ?? ''); ?>" required>
+
+                    <label style="color: #9CA3AF; font-size: 13px;">Horario de entregas (L - V):</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="time" name="hora_inicio" class="celular" min="07:00" max="21:00" value="<?php echo htmlspecialchars($usuario['hora_inicio'] ?? '07:00'); ?>" required style="flex: 1;">
+                        <span style="color: white;">a</span>
+                        <input type="time" name="hora_fin" class="celular" min="07:00" max="21:00" value="<?php echo htmlspecialchars($usuario['hora_fin'] ?? '21:00'); ?>" required style="flex: 1;">
+                    </div>
+                    <p style="font-size: 11px; color: #9CA3AF; margin-top: -3px; margin-bottom: 5px;">* Rango permitido: 07:00 AM - 09:00 PM</p>
+
                     <label style="color: #9CA3AF; font-size: 13px;">Sobre mí:</label>
                     <textarea name="biografia" class="presentacion" required><?php echo htmlspecialchars($usuario['biografia'] ?? ''); ?></textarea>
                     
@@ -122,10 +148,15 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
 
         <div class="detalles">
             
-            <h2 style="color: white; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 20px;">📦 Mi Sección de Ventas</h2>
-            
-            <div class="bloques">
-                <section class="tarjeta">
+            <div class="menu-modos" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #374151; padding-bottom: 15px;">
+                <button onclick="cambiarModo('vendedor')" id="btn-vendedor" class="btn-accion btn-aceptar" style="flex: 1; font-size: 16px; padding: 12px;">🏢 MODO VENDEDOR</button>
+                <button onclick="cambiarModo('comprador')" id="btn-comprador" class="btn-accion" style="flex: 1; background: transparent; color: #9CA3AF; border: 1px solid #374151; font-size: 16px; padding: 12px;">🛒 MODO COMPRADOR</button>
+            </div>
+
+            <div id="modo-vendedor" style="display: block;">
+                <h2 style="color: white; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 20px;">📦 Panel de Administración de Ventas</h2>
+                
+                <section class="tarjeta" style="margin-bottom: 30px;">
                     <h3 class="titulo">Mis Productos en Venta</h3>
                     <div class="catalogo">
                         <?php 
@@ -138,244 +169,267 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
                                 <h4><?php echo htmlspecialchars($prod['titulo']); ?></h4>
                                 <p class="costo">$<?php echo htmlspecialchars($prod['precio']); ?> MXN (Stock: <?php echo $prod['stock']; ?>)</p>
                             </div>
-                            <!-- Reemplaza el botón quitar original por este formulario -->
                             <form action="eliminar_producto.php" method="POST" style="margin:0;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
                                 <input type="hidden" name="id_producto" value="<?php echo $prod['id_producto']; ?>">
-                                <button type="submit" class="quitar" style="background:transparent; border:none; color:#EF4444; font-size:18px; font-weight:bold; cursor:pointer;" title="Eliminar producto">✖</button>
+                                <button type="submit" class="quitar" style="background:transparent; border:none; color:#EF4444; font-size:18px; font-weight:bold; cursor:pointer;">✖</button>
                             </form>
                         </div>
                         <?php 
                             }
                         } else {
-                            echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos publicados actualmente.</p>";
+                            echo "<p style='color: #94A3B8; padding: 15px; font-size:14px;'>No tienes productos publicados actualmente.</p>";
                         }
                         ?>
                     </div>
                 </section>
 
-                
-                
-            </div>
-
-            <section class="tarjeta publicar">
-                <h3 class="titulo">Subir Nuevo Producto</h3>
-                <form action="procesar_producto.php" method="POST" enctype="multipart/form-data" class="formulario">
-                    <div class="division">
-                        <div class="campo">
-                            <label>Nombre del artículo</label>
-                            <input type="text" name="titulo_prod" placeholder="Ej. Protoboard grande" required>
-                        </div>
-                        <div class="campo">
-                            <label>Precio (MXN)</label>
-                            <input type="number" name="precio_prod" placeholder="Ej. 150" step="0.50" required>
-                        </div>
-                        <div class="campo">
-                            <label>Stock disponible</label>
-                            <input type="number" name="stock_prod" placeholder="Ej. 5" min="1" required>
-                        </div>
-                    </div>
-
-                    <div class="division">
-                        <div class="campo">
-                            <label for="categoria">Categoría</label>
-                            <select id="categoria" name="categoria_prod" onchange="filtrarSubcategorias()" required>
-                                <option value="" disabled selected>Selecciona una categoría</option>
-                                <option value="electronica">Electrónica y Componentes</option>
-                                <option value="digital">Digital</option>
-                                <option value="alimentos">Alimentos</option>
-                                <option value="accesorios">Accesorios</option>
-                                <option value="ropa">Ropa</option>
-                            </select>
-                        </div>
-                        <div class="campo">
-                            <label for="subcategoria">Subcategoría</label>
-                            <select id="subcategoria" name="subcategoria_prod" required>
-                                <option value="" disabled selected>Selecciona primero una categoría</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="division">
-                        <div class="campo">
-                            <label>Imagen principal (Portada)</label>
-                            <input type="file" name="imagen_principal" class="archivo" accept="image/*" required>
-                        </div>
-                        <div class="campo">
-                            <label>Video demostrativo (Opcional)</label>
-                            <input type="file" name="video_prod" class="archivo" accept="video/*">
-                        </div>
-                    </div>
-
-                    <div class="campo" style="margin-bottom: 15px;">
-                        <label>Imágenes secundarias / Capturas (Opcional)</label>
-                        <input type="file" name="imagenes_secundarias[]" class="archivo" accept="image/*" multiple>
-                        <p style="font-size: 11px; color: #9CA3AF; margin-top: 5px;">* Puedes seleccionar varias imágenes al mismo tiempo dejando presionado 'Ctrl'.</p>
-                    </div>
-
-                    <div class="campo">
-                        <label>Descripción y detalles</label>
-                        <textarea name="desc_prod" placeholder="Describe el estado de tu producto..." required></textarea>
-                    </div>
-                    <button type="submit" class="mandar">Publicar Artículo</button>
-                </form>
-            </section>
-
-            <h2 class="seccion-compras-titulo">🛒 Mi Sección de Compras</h2>
-            
-            <div class="bloques">
-                <section class="tarjeta">
-                    <h3 class="titulo">Mi Historial de Pedidos (Compras propias)</h3>
-                    <div class="lista">
-                        <?php 
-                        if($historial_pedidos && mysqli_num_rows($historial_pedidos) > 0) {
-                            while($pedido = mysqli_fetch_assoc($historial_pedidos)) { 
-                        ?>
-                        <div class="renglon">
-                            <img src="<?php echo htmlspecialchars($pedido['ruta_imagen']); ?>" alt="Item" class="miniatura" style="object-fit: cover;">
-                            <div class="info">
-                                <h4><?php echo htmlspecialchars($pedido['titulo_producto']); ?></h4>
-                                <p style="color:#9CA3AF; font-size: 13px;">Fecha: <?php echo htmlspecialchars($pedido['fecha_compra']); ?> - Vendedor: <?php echo htmlspecialchars($pedido['vendedor']); ?></p>
+                <section class="tarjeta publicar" style="margin-bottom: 30px;">
+                    <h3 class="titulo">Subir Nuevo Producto</h3>
+                    <form action="procesar_producto.php" method="POST" enctype="multipart/form-data" class="formulario">
+                        <div class="division">
+                            <div class="campo">
+                                <label>Nombre del artículo</label>
+                                <input type="text" name="titulo_prod" placeholder="Ej. Arduino Uno" required>
                             </div>
-                            
-                            <!-- FORMULARIO ACTUALIZADO: Apunta a eliminar_producto.php -->
-                            <form action="eliminar_producto.php" method="POST" style="margin: 0;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pedido de tu historial?');">
-                                <input type="hidden" name="accion" value="eliminar_pedido">
-                                <input type="hidden" name="id_pedido" value="<?php echo $pedido['id_pedido']; ?>">
-                                <button type="submit" class="quitar" style="background: transparent; border: none; color: #EF4444; font-size: 18px; font-weight: bold; cursor: pointer;" title="Eliminar del historial">✖</button>
-                            </form>
-
-                        </div>
-                        <?php 
-                            } 
-                        } else {
-                            echo "<p style='color: #94A3B8; padding: 15px;'>Aún no tienes pedidos registrados como comprador.</p>";
-                        }
-                        ?>
-                    </div>
-                </section>
-                <section class="tarjeta">
-                    <h3 class="titulo">Vendedores con los que he comprado</h3>
-                    <div class="lista">
-                        <?php 
-                        if($historial_vendedores && mysqli_num_rows($historial_vendedores) > 0) {
-                            while($vend = mysqli_fetch_assoc($historial_vendedores)) { 
-                        ?>
-                        <div class="renglon">
-                            <img src="<?php echo !empty($vend['ruta_foto_perfil']) ? htmlspecialchars($vend['ruta_foto_perfil']) : 'IMAGENES/logosf.png'; ?>" alt="Vendedor" class="miniatura" style="border-radius:50%; object-fit: cover;">
-                            <div class="info">
-                                <h4><?php echo htmlspecialchars($vend['username']); ?></h4>
-                                <p style="color:#9CA3AF; font-size: 13px;">Contacto: <?php echo htmlspecialchars($vend['correo']); ?></p>
+                            <div class="campo">
+                                <label>Precio (MXN)</label>
+                                <input type="number" name="precio_prod" step="0.50" required>
                             </div>
-                            <button onclick="window.location.href='PERFIL_VENDEDOR.html?user=<?php echo urlencode($vend['username']); ?>'" style="background:transparent; color:#60A5FA; border:1px solid #60A5FA; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">Visitar Perfil</button>
+                            <div class="campo">
+                                <label>Stock</label>
+                                <input type="number" name="stock_prod" min="1" required>
+                            </div>
                         </div>
-                        <?php 
-                            } 
-                        } else {
-                            echo "<p style='color: #94A3B8; padding: 15px;'>Aún no le has comprado a nadie en la plataforma.</p>";
-                        }
-                        ?>
-                    </div>
+                        <div class="division">
+                            <div class="campo">
+                                <label>Categoría</label>
+                                <select id="categoria" name="categoria_prod" onchange="filtrarSubcategorias()" required>
+                                    <option value="" disabled selected>Selecciona una categoría</option>
+                                    <option value="electronica">Electrónica y Componentes</option>
+                                    <option value="digital">Digital</option>
+                                    <option value="alimentos">Alimentos</option>
+                                    <option value="accesorios">Accesorios</option>
+                                    <option value="ropa">Ropa</option>
+                                </select>
+                            </div>
+                            <div class="campo">
+                                <label>Subcategoría</label>
+                                <select id="subcategoria" name="subcategoria_prod" required>
+                                    <option value="" disabled selected>Selecciona primero una categoría</option>
+                                </select>
+                            </div>
+                        </div>
+                       <div class="division">
+                            <div class="campo">
+                                <label>Imagen principal (Portada)</label>
+                                <input type="file" name="imagen_principal" class="archivo" accept="image/*" required>
+                            </div>
+                            <div class="campo">
+                                <label>Video (Opcional)</label>
+                                <input type="file" name="video_prod" class="archivo" accept="video/*">
+                            </div>
+                        </div>
+                        
+                        <div class="campo" style="margin-bottom: 10px;">
+                            <label>Imágenes secundarias / Capturas (Opcional)</label>
+                            <input type="file" name="imagenes_secundarias[]" class="archivo" accept="image/*" multiple>
+                            <p style="font-size: 11px; color: #9CA3AF; margin-top: 5px;">* Mantén 'Ctrl' en tu teclado para seleccionar varias fotos a la vez.</p>
+                        </div>
+                        
+                        <div class="campo">
+                            <label>Descripción y detalles</label>
+                            <textarea name="desc_prod" required></textarea>
+                        </div>
+                        <button type="submit" class="mandar">Publicar Artículo</button>
+                    </form>
                 </section>
-            </div>
 
-            <section class="tarjeta" style="margin-top: 20px;">
-                <h3 class="titulo">Mis Productos Guardados (Favoritos)</h3>
-                <div class="lista">
-                    <?php 
-                    if($lista_favoritos && mysqli_num_rows($lista_favoritos) > 0) {
-                        while($fav = mysqli_fetch_assoc($lista_favoritos)) { 
-                    ?>
-                    <div class="renglon">
-                        <img src="<?php echo htmlspecialchars($fav['ruta_imagen']); ?>" alt="Item" class="miniatura" style="object-fit: cover;">
-                        <div class="info">
-                            <h4><?php echo htmlspecialchars($fav['titulo_producto']); ?></h4>
-                            <p class="costo">$<?php echo htmlspecialchars($fav['precio']); ?> MXN</p>
+                <h3 style="color: white; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 15px;">📊 Estado de mis ventas</h3>
+                <div class="bloques">
+                    <section class="tarjeta">
+                        <h3 class="titulo" style="color: #F59E0B;">⏳ En Espera</h3>
+                        <div class="lista">
+                            <?php if($pedidos_espera && mysqli_num_rows($pedidos_espera) > 0) {
+                                while($ped = mysqli_fetch_assoc($pedidos_espera)) { ?>
+                                    <div class="renglon">
+                                        <img src="<?php echo htmlspecialchars($ped['ruta_imagen']); ?>" class="miniatura" style="object-fit:cover;">
+                                        <div class="info">
+                                            <h4><?php echo htmlspecialchars($ped['titulo_producto']); ?></h4>
+                                            <p style="color:#9CA3AF; font-size: 13px;">Comprador: <?php echo htmlspecialchars($ped['comp_nombres']); ?> | Cant.: <?php echo $ped['cantidad']; ?></p>
+                                        </div>
+                                    </div>
+                            <?php } } else { echo "<p style='color: #94A3B8; font-size:13px; padding:10px;'>No hay pedidos pendientes.</p>"; } ?>
                         </div>
-                        <form action="quitar_favorito.php" method="POST">
-                            <input type="hidden" name="id_favorito" value="<?php echo $fav['id_favorito']; ?>">
-                            <button type="submit" class="corazon" style="background: none; border: none; font-size: 20px; cursor: pointer;">❤️</button>
-                        </form>
-                    </div>
-                    <?php 
-                        } 
-                    } else {
-                        echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos en favoritos.</p>";
-                    }
-                    ?>
+                    </section>
+
+                    <section class="tarjeta">
+                        <h3 class="titulo" style="color: #10B981;">✅ Aceptados</h3>
+                        <div class="lista">
+                            <?php if($pedidos_aceptados && mysqli_num_rows($pedidos_aceptados) > 0) {
+                                while($ped = mysqli_fetch_assoc($pedidos_aceptados)) { ?>
+                                    <div class="renglon">
+                                        <img src="<?php echo htmlspecialchars($ped['ruta_imagen']); ?>" class="miniatura" style="object-fit:cover;">
+                                        <div class="info">
+                                            <h4><?php echo htmlspecialchars($ped['titulo_producto']); ?></h4>
+                                            <p style="color:#9CA3AF; font-size: 13px;">Comprador: <?php echo htmlspecialchars($ped['comp_nombres']); ?></p>
+                                        </div>
+                                    </div>
+                            <?php } } else { echo "<p style='color: #94A3B8; font-size:13px; padding:10px;'>No hay entregas completadas aún.</p>"; } ?>
+                        </div>
+                    </section>
+
+                    <section class="tarjeta">
+                        <h3 class="titulo" style="color: #EF4444;">❌ Regresados</h3>
+                        <div class="lista">
+                            <?php if($pedidos_regresados && mysqli_num_rows($pedidos_regresados) > 0) {
+                                while($ped = mysqli_fetch_assoc($pedidos_regresados)) { ?>
+                                    <div class="renglon">
+                                        <img src="<?php echo htmlspecialchars($ped['ruta_imagen']); ?>" class="miniatura" style="object-fit:cover;">
+                                        <div class="info">
+                                            <h4 style="text-decoration: line-through; color: #EF4444;"><?php echo htmlspecialchars($ped['titulo_producto']); ?></h4>
+                                            <p style="color:#9CA3AF; font-size: 13px;">Cancelado por: <?php echo htmlspecialchars($ped['comp_nombres']); ?></p>
+                                        </div>
+                                        <form action="eliminar_producto.php" method="POST" style="margin: 0;" onsubmit="return confirm('¿Seguro que deseas limpiar este pedido cancelado de tu lista?');">
+                                            <input type="hidden" name="accion" value="eliminar_regresado">
+                                            <input type="hidden" name="id_pedido" value="<?php echo $ped['id_pedido']; ?>">
+                                            <button type="submit" class="quitar" style="background: transparent; border: none; color: #EF4444; font-size: 18px; font-weight: bold; cursor: pointer;" title="Limpiar registro">✖</button>
+                                        </form>
+                                    </div>
+                            <?php } } else { echo "<p style='color: #94A3B8; font-size:13px; padding:10px;'>Ningún pedido cancelado.</p>"; } ?>
+                        </div>
+                    </section>
                 </div>
-            </section>
+            </div>
+
+            <div id="modo-comprador" style="display: none;">
+                <h2 style="color: white; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 20px;">🛒 Panel de Compras</h2>
+                
+                <div class="bloques" style="flex-direction: column;">
+                    <section class="tarjeta" style="width: 100%;">
+                        <h3 class="titulo">Mi Historial de Pedidos</h3>
+                        <div class="lista">
+                            <?php if($historial_pedidos && mysqli_num_rows($historial_pedidos) > 0) {
+                                while($pedido = mysqli_fetch_assoc($historial_pedidos)) { ?>
+                            <div class="renglon">
+                                <img src="<?php echo htmlspecialchars($pedido['ruta_imagen']); ?>" class="miniatura" style="object-fit: cover;">
+                                <div class="info">
+                                    <h4><?php echo htmlspecialchars($pedido['titulo_producto']); ?></h4>
+                                    <p style="color:#9CA3AF; font-size: 13px;">Fecha: <?php echo htmlspecialchars($pedido['fecha_compra']); ?> - Vendedor: <?php echo htmlspecialchars($pedido['vendedor']); ?></p>
+                                </div>
+                                <form action="eliminar_producto.php" method="POST" style="margin: 0;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pedido de tu historial?');">
+                                    <input type="hidden" name="accion" value="eliminar_pedido">
+                                    <input type="hidden" name="id_pedido" value="<?php echo $pedido['id_pedido']; ?>">
+                                    <button type="submit" class="quitar" style="background: transparent; border: none; color: #EF4444; font-size: 18px; font-weight: bold; cursor: pointer;">✖</button>
+                                </form>
+                            </div>
+                            <?php } } else { echo "<p style='color: #94A3B8; padding: 15px;'>Aún no tienes pedidos registrados.</p>"; } ?>
+                        </div>
+                    </section>
+
+                    <section class="tarjeta" style="width: 100%;">
+                        <h3 class="titulo">Mis Productos Guardados</h3>
+                        <div class="lista">
+                            <?php if($lista_favoritos && mysqli_num_rows($lista_favoritos) > 0) {
+                                while($fav = mysqli_fetch_assoc($lista_favoritos)) { ?>
+                            <div class="renglon">
+                                <img src="<?php echo htmlspecialchars($fav['ruta_imagen']); ?>" class="miniatura" style="object-fit: cover;">
+                                <div class="info">
+                                    <h4><?php echo htmlspecialchars($fav['titulo_producto']); ?></h4>
+                                    <p class="costo">$<?php echo htmlspecialchars($fav['precio']); ?> MXN</p>
+                                </div>
+                            </div>
+                            <?php } } else { echo "<p style='color: #94A3B8; padding: 15px;'>No tienes productos en favoritos.</p>"; } ?>
+                        </div>
+                    </section>
+                </div>
+            </div>
 
         </div>
+
     </main>
 
     <script>
-        // Función para mostrar y ocultar los detalles del pedido apartado
-        function toggleDetalles(idPedido) {
-            const panel = document.getElementById('detalles-' + idPedido);
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
+        const subcategorias = {
+            electronica: [
+                { value: 'circuitos integrados', texto: 'Circuitos Integrados' },
+                { value: 'pinzas', texto: 'Pinzas' },
+                { value: 'cables', texto: 'Cables' },
+                { value: 'placas', texto: 'Placas' },
+                { value: 'dispositivos de medicion', texto: 'Dispositivos de Medición' },
+                { value: 'otros', texto: 'Otros' }
+            ],
+            digital: [
+                { value: 'pc/laptops', texto: 'PC / Laptops' },
+                { value: 'celulares', texto: 'Celulares' },
+                { value: 'componentes', texto: 'Componentes' },
+                { value: 'cargadores', texto: 'Cargadores' },
+                { value: 'gadgets', texto: 'Gadgets' },
+                { value: 'perifericos', texto: 'Periféricos' },
+                { value: 'otros', texto: 'Otros' }
+            ],
+            alimentos: [
+                { value: 'comida rapida', texto: 'Comida Rápida' },
+                { value: 'comida casera', texto: 'Comida Casera' },
+                { value: 'botanita', texto: 'Botanita' },
+                { value: 'dulces', texto: 'Dulces' }
+            ],
+            accesorios: [
+                { value: 'collares', texto: 'Collares' },
+                { value: 'anillos', texto: 'Anillos' },
+                { value: 'pines', texto: 'Pines' },
+                { value: 'relojes', texto: 'Relojes' },
+                { value: 'otros', texto: 'Otros' }
+            ],
+            ropa: [
+                { value: 'Deporte', texto: 'Para deporte' },
+                { value: 'Hombre', texto: 'Para hombres' },
+                { value: 'Mujeres', texto: 'Para mujeres' },
+                { value: 'otros', texto: 'Otros' }
+            ]
+        };
+
+        function filtrarSubcategorias() {
+            const categoriaSeleccionada = document.getElementById('categoria').value;
+            const comboSubcategoria = document.getElementById('subcategoria');
+
+            comboSubcategoria.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
+
+            if (subcategorias[categoriaSeleccionada]) {
+                subcategorias[categoriaSeleccionada].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.value; 
+                    option.textContent = sub.texto; 
+                    comboSubcategoria.appendChild(option);
+                });
             }
         }
 
-        // Función original de subcategorías
-        const subcategorias = {
-        electronica: [
-            { value: 'circuitos integrados', texto: 'Circuitos Integrados' },
-            { value: 'pinzas', texto: 'Pinzas' },
-            { value: 'cables', texto: 'Cables' },
-            { value: 'placas', texto: 'Placas' },
-            { value: 'dispositivos de medicion', texto: 'Dispositivos de Medición' },
-            { value: 'otros', texto: 'Otros' }
-        ],
-        digital: [
-            { value: 'pc/laptops', texto: 'PC / Laptops' },
-            { value: 'celulares', texto: 'Celulares' },
-            { value: 'componentes', texto: 'Componentes' },
-            { value: 'cargadores', texto: 'Cargadores' },
-            { value: 'gadgets', texto: 'Gadgets' },
-            { value: 'perifericos', texto: 'Periféricos' },
-            { value: 'otros', texto: 'Otros' }
-        ],
-        alimentos: [
-            { value: 'comida rapida', texto: 'Comida Rápida' },
-            { value: 'comida casera', texto: 'Comida Casera' },
-            { value: 'botanita', texto: 'Botanita' },
-            { value: 'dulces', texto: 'Dulces' }
-        ],
-        accesorios: [
-            { value: 'collares', texto: 'Collares' },
-            { value: 'anillos', texto: 'Anillos' },
-            { value: 'pines', texto: 'Pines' },
-            { value: 'relojes', texto: 'Relojes' },
-            { value: 'otros', texto: 'Otros' }
-        ],
-        ropa: [
-            { value: 'Deporte', texto: 'Para deporte' },
-            { value: 'Hombre', texto: 'Para hombres' },
-            { value: 'Mujeres', texto: 'Para mujeres' },
-            { value: 'otros', texto: 'Otros' }
-        ]
-    };
+        function cambiarModo(modo) {
+            const divVendedor = document.getElementById('modo-vendedor');
+            const divComprador = document.getElementById('modo-comprador');
+            const btnVendedor = document.getElementById('btn-vendedor');
+            const btnComprador = document.getElementById('btn-comprador');
 
-    function filtrarSubcategorias() {
-        const categoriaSeleccionada = document.getElementById('categoria').value;
-        const comboSubcategoria = document.getElementById('subcategoria');
-
-        // Limpiar el menú secundario antes de cargar los nuevos
-        comboSubcategoria.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
-
-        // Rellenar las subcategorías correspondientes
-        if (subcategorias[categoriaSeleccionada]) {
-            subcategorias[categoriaSeleccionada].forEach(sub => {
-                const option = document.createElement('option');
-                option.value = sub.value; 
-                option.textContent = sub.texto; 
-                comboSubcategoria.appendChild(option);
-            });
+            if(modo === 'vendedor') {
+                divVendedor.style.display = 'block';
+                divComprador.style.display = 'none';
+                btnVendedor.style.background = '#10B981';
+                btnVendedor.style.color = 'white';
+                btnVendedor.style.border = 'none';
+                btnComprador.style.background = 'transparent';
+                btnComprador.style.color = '#9CA3AF';
+                btnComprador.style.border = '1px solid #374151';
+            } else {
+                divVendedor.style.display = 'none';
+                divComprador.style.display = 'block';
+                btnComprador.style.background = '#3B82F6';
+                btnComprador.style.color = 'white';
+                btnComprador.style.border = 'none';
+                btnVendedor.style.background = 'transparent';
+                btnVendedor.style.color = '#9CA3AF';
+                btnVendedor.style.border = '1px solid #374151';
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
