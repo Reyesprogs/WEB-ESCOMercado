@@ -16,7 +16,7 @@ $resultado_usuario = mysqli_query($conexion, $query_usuario);
 $usuario = mysqli_fetch_assoc($resultado_usuario);
 
 // 2. VENTAS: Obtener los productos que este vendedor tiene activos
-$q_mis_productos = "SELECT * FROM productos WHERE id_vendedor = $id_usuario AND estado != 'vendido'";
+$q_mis_productos = "SELECT * FROM productos WHERE id_vendedor = $id_usuario AND estado != 'vendido' AND estado != 'eliminado'";
 $mis_productos = mysqli_query($conexion, $q_mis_productos);
 
 // 3. VENTAS: Obtener pedidos apartados (pendientes de confirmación/entrega)
@@ -153,58 +153,8 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
                     </div>
                 </section>
 
-                <section class="tarjeta">
-                    <h3 class="titulo">Pedidos de mis Clientes (Apartados)</h3>
-                    <div class="catalogo">
-                        <?php 
-                        if($pedidos_apartados && mysqli_num_rows($pedidos_apartados) > 0) {
-                            while($apartado = mysqli_fetch_assoc($pedidos_apartados)) { 
-                        ?>
-                        <div class="renglon destacado" style="flex-wrap: wrap;">
-                            <div style="display:flex; width:100%; justify-content:space-between; align-items:center;">
-                                <div class="info" style="display:flex; gap:15px; align-items:center;">
-                                    <img src="<?php echo htmlspecialchars($apartado['ruta_imagen']); ?>" alt="Item" class="miniatura">
-                                    <div>
-                                        <h4><?php echo htmlspecialchars($apartado['titulo_producto']); ?></h4>
-                                        <p class="comprador">Apartado por: <?php echo htmlspecialchars($apartado['comprador_user']); ?></p>
-                                    </div>
-                                </div>
-                                <button class="revisar" onclick="toggleDetalles(<?php echo $apartado['id_pedido']; ?>)">Ver detalles ▼</button>
-                            </div>
-                            
-                            <div id="detalles-<?php echo $apartado['id_pedido']; ?>" style="display: none; width: 100%; margin-top: 15px; background: #0F172A; padding: 15px; border-radius: 8px; border: 1px solid #1F2937;">
-                                <div style="display:flex; gap:20px; flex-wrap:wrap;">
-                                    <div style="flex:1; min-width:200px;">
-                                        <h5 style="color:#60A5FA; margin-bottom:10px;">📌 Datos de Entrega</h5>
-                                        <p style="color:#D1D5DB; font-size:13px;">Lugar: <?php echo htmlspecialchars($apartado['zona_entrega']); ?></p>
-                                        <p style="color:#D1D5DB; font-size:13px;">Horario: <?php echo isset($apartado['horario_entrega']) ? htmlspecialchars($apartado['horario_entrega']) : 'Por definir'; ?></p>
-                                        <p style="color:#D1D5DB; font-size:13px;">Cantidad: <?php echo htmlspecialchars($apartado['cantidad']); ?> pieza(s)</p>
-                                        <p style="color:#10B981; font-size:15px; font-weight:bold; margin-top:5px;">Total a pagar: $<?php echo htmlspecialchars($apartado['total']); ?> MXN</p>
-                                    </div>
-                                    <div style="flex:1; min-width:200px; text-align:center;">
-                                        <h5 style="color:#60A5FA; margin-bottom:10px;">📸 Evidencia (Transferencia)</h5>
-                                        <img src="<?php echo isset($apartado['ruta_evidencia']) ? htmlspecialchars($apartado['ruta_evidencia']) : 'https://via.placeholder.com/150'; ?>" alt="Evidencia" style="width:100px; height:auto; border-radius:8px; border:1px solid #374151;">
-                                    </div>
-                                </div>
-                                
-                                <div style="display:flex; gap:10px; margin-top:15px; justify-content:flex-end;">
-                                    <form action="procesar_pedido.php" method="POST" style="margin:0;">
-                                        <input type="hidden" name="id_pedido" value="<?php echo $apartado['id_pedido']; ?>">
-                                        <button type="submit" name="accion" value="aceptar" class="btn-accion btn-aceptar">✅ Aceptar</button>
-                                        <button type="submit" name="accion" value="regresar" class="btn-accion btn-regresar">🔄 Regresar</button>
-                                        <button type="submit" name="accion" value="cancelar" class="btn-accion btn-cancelar">❌ Cancelar</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <?php 
-                            } 
-                        } else {
-                            echo "<p style='color: #94A3B8; padding: 15px;'>No tienes pedidos pendientes de clientes en este momento.</p>";
-                        }
-                        ?>
-                    </div>
-                </section>
+                
+                
             </div>
 
             <section class="tarjeta publicar">
@@ -286,6 +236,14 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
                                 <h4><?php echo htmlspecialchars($pedido['titulo_producto']); ?></h4>
                                 <p style="color:#9CA3AF; font-size: 13px;">Fecha: <?php echo htmlspecialchars($pedido['fecha_compra']); ?> - Vendedor: <?php echo htmlspecialchars($pedido['vendedor']); ?></p>
                             </div>
+                            
+                            <!-- FORMULARIO ACTUALIZADO: Apunta a eliminar_producto.php -->
+                            <form action="eliminar_producto.php" method="POST" style="margin: 0;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pedido de tu historial?');">
+                                <input type="hidden" name="accion" value="eliminar_pedido">
+                                <input type="hidden" name="id_pedido" value="<?php echo $pedido['id_pedido']; ?>">
+                                <button type="submit" class="quitar" style="background: transparent; border: none; color: #EF4444; font-size: 18px; font-weight: bold; cursor: pointer;" title="Eliminar del historial">✖</button>
+                            </form>
+
                         </div>
                         <?php 
                             } 
@@ -295,7 +253,6 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
                         ?>
                     </div>
                 </section>
-
                 <section class="tarjeta">
                     <h3 class="titulo">Vendedores con los que he comprado</h3>
                     <div class="lista">

@@ -2,7 +2,7 @@
 session_start();
 require 'conexion.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
+if (!isset($_SESSION['id_usuario']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
     header("Location: ACCESO.html");
     exit();
 }

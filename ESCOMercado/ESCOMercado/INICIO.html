@@ -40,11 +40,7 @@ $resultado_destacados = mysqli_query($conexion, $query_destacados);
                     Hola, <?php echo $_SESSION['usuario_nombre']; ?>
                 </span>
                 
-                <?php if($_SESSION['usuario_rol'] == 'comprador') { ?>
-                    <button class="btn-nav" onclick="window.location.href='CUENTA_C.html'">Mi Panel</button>
-                <?php } else { ?>
-                    <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Panel Vendedor</button>
-                <?php } ?>
+                <button class="btn-nav" onclick="window.location.href='CUENTA_V.html'">Mi Panel</button>
                 
                 <button class="btn-nav" onclick="window.location.href='cerrar_sesion.php'" style="background-color: #e74c3c; border-color: #e74c3c;">Salir</button>
             <?php } else { ?>
