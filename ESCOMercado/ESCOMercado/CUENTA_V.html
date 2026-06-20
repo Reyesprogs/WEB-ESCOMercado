@@ -138,7 +138,11 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
                                 <h4><?php echo htmlspecialchars($prod['titulo']); ?></h4>
                                 <p class="costo">$<?php echo htmlspecialchars($prod['precio']); ?> MXN (Stock: <?php echo $prod['stock']; ?>)</p>
                             </div>
-                            <button class="quitar">✖</button>
+                            <!-- Reemplaza el botón quitar original por este formulario -->
+                            <form action="eliminar_producto.php" method="POST" style="margin:0;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                                <input type="hidden" name="id_producto" value="<?php echo $prod['id_producto']; ?>">
+                                <button type="submit" class="quitar" style="background:transparent; border:none; color:#EF4444; font-size:18px; font-weight:bold; cursor:pointer;" title="Eliminar producto">✖</button>
+                            </form>
                         </div>
                         <?php 
                             }
@@ -227,9 +231,10 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
                             <select id="categoria" name="categoria_prod" onchange="filtrarSubcategorias()" required>
                                 <option value="" disabled selected>Selecciona una categoría</option>
                                 <option value="electronica">Electrónica y Componentes</option>
-                                <option value="computacion">Equipo de Cómputo</option>
-                                <option value="academicos">Materiales Académicos</option>
-                                <option value="laboratorio">Equipo de Laboratorio</option>
+                                <option value="digital">Digital</option>
+                                <option value="alimentos">Alimentos</option>
+                                <option value="accesorios">Accesorios</option>
+                                <option value="ropa">Ropa</option>
                             </select>
                         </div>
                         <div class="campo">
@@ -359,43 +364,61 @@ $historial_vendedores = mysqli_query($conexion, $q_mis_vendedores);
 
         // Función original de subcategorías
         const subcategorias = {
-            electronica: [
-                { value: 'microcontroladores', texto: 'Arduinos y Microcontroladores' },
-                { value: 'prototipado', texto: 'Protoboards y Jumpers' },
-                { value: 'componentes', texto: 'Componentes (Resistencias, LEDs, etc.)' },
-                { value: 'herramientas', texto: 'Herramientas (Cautín, Multímetro)' }
-            ],
-            computacion: [
-                { value: 'laptops', texto: 'Laptops y Computadoras' },
-                { value: 'perifericos', texto: 'Teclados, Mouses y Monitores' },
-                { value: 'componentes_pc', texto: 'RAM, Almacenamiento y Tarjetas' }
-            ],
-            academicos: [
-                { value: 'libros', texto: 'Libros y Literatura Técnica' },
-                { value: 'calculadoras', texto: 'Calculadoras Científicas' },
-                { value: 'utiles', texto: 'Papelería y Dibujo Técnico' }
-            ],
-            laboratorio: [
-                { value: 'vestimenta', texto: 'Batas y Goggles de protección' },
-                { value: 'kits_quimica', texto: 'Kits / Material de Química' }
-            ]
-        };
+        electronica: [
+            { value: 'circuitos integrados', texto: 'Circuitos Integrados' },
+            { value: 'pinzas', texto: 'Pinzas' },
+            { value: 'cables', texto: 'Cables' },
+            { value: 'placas', texto: 'Placas' },
+            { value: 'dispositivos de medicion', texto: 'Dispositivos de Medición' },
+            { value: 'otros', texto: 'Otros' }
+        ],
+        digital: [
+            { value: 'pc/laptops', texto: 'PC / Laptops' },
+            { value: 'celulares', texto: 'Celulares' },
+            { value: 'componentes', texto: 'Componentes' },
+            { value: 'cargadores', texto: 'Cargadores' },
+            { value: 'gadgets', texto: 'Gadgets' },
+            { value: 'perifericos', texto: 'Periféricos' },
+            { value: 'otros', texto: 'Otros' }
+        ],
+        alimentos: [
+            { value: 'comida rapida', texto: 'Comida Rápida' },
+            { value: 'comida casera', texto: 'Comida Casera' },
+            { value: 'botanita', texto: 'Botanita' },
+            { value: 'dulces', texto: 'Dulces' }
+        ],
+        accesorios: [
+            { value: 'collares', texto: 'Collares' },
+            { value: 'anillos', texto: 'Anillos' },
+            { value: 'pines', texto: 'Pines' },
+            { value: 'relojes', texto: 'Relojes' },
+            { value: 'otros', texto: 'Otros' }
+        ],
+        ropa: [
+            { value: 'Deporte', texto: 'Para deporte' },
+            { value: 'Hombre', texto: 'Para hombres' },
+            { value: 'Mujeres', texto: 'Para mujeres' },
+            { value: 'otros', texto: 'Otros' }
+        ]
+    };
 
-        function filtrarSubcategorias() {
-            const categoriaSeleccionada = document.getElementById('categoria').value;
-            const comboSubcategoria = document.getElementById('subcategoria');
+    function filtrarSubcategorias() {
+        const categoriaSeleccionada = document.getElementById('categoria').value;
+        const comboSubcategoria = document.getElementById('subcategoria');
 
-            comboSubcategoria.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
+        // Limpiar el menú secundario antes de cargar los nuevos
+        comboSubcategoria.innerHTML = '<option value="" disabled selected>Selecciona una subcategoría</option>';
 
-            if (subcategorias[categoriaSeleccionada]) {
-                subcategorias[categoriaSeleccionada].forEach(sub => {
-                    const option = document.createElement('option');
-                    option.value = sub.value;
-                    option.textContent = sub.texto;
-                    comboSubcategoria.appendChild(option);
-                });
-            }
+        // Rellenar las subcategorías correspondientes
+        if (subcategorias[categoriaSeleccionada]) {
+            subcategorias[categoriaSeleccionada].forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub.value; 
+                option.textContent = sub.texto; 
+                comboSubcategoria.appendChild(option);
+            });
         }
-    </script>
+    }
+</script>
 </body>
 </html>
